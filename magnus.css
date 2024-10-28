@@ -15,7 +15,6 @@ body {
 /* Header and navigation styling */
 header {
     background-color: #007bff;
-    /* Main blue color */
     color: #fff;
     padding: 20px 0;
     text-align: center;
@@ -40,7 +39,6 @@ header nav a {
 header nav a:hover {
     text-decoration: underline;
 }
-
 
 /* Hero section styling */
 .hero {
@@ -89,21 +87,25 @@ header nav a:hover {
     margin-bottom: 10px;
 }
 
-
 li {
     margin-bottom: 10px;
 }
 
-.card img,
-video {
-    display: block;
-    margin: 0 auto;
-    max-width: 300px;
-    height: auto;
-    margin-bottom: 20px;
-    border-radius: 8px;
+/* Specific styling for video container */
+.video-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
 }
 
+.video-container iframe {
+    max-width: 100%;
+    width: 560px;
+    /* Adjust width as needed */
+    height: 315px;
+    /* Adjust height as needed */
+}
 
 /* Footer styling */
 footer {
@@ -126,5 +128,10 @@ footer p {
 
     .card {
         padding: 10px;
+    }
+
+    .video-container iframe {
+        width: 100%;
+        height: auto;
     }
 }
