@@ -15,6 +15,7 @@ body {
 /* Header and navigation styling */
 header {
     background-color: #007bff;
+    /* Main blue color */
     color: #fff;
     padding: 20px 0;
     text-align: center;
@@ -39,6 +40,7 @@ header nav a {
 header nav a:hover {
     text-decoration: underline;
 }
+
 
 /* Hero section styling */
 .hero {
@@ -87,25 +89,21 @@ header nav a:hover {
     margin-bottom: 10px;
 }
 
+
 li {
     margin-bottom: 10px;
 }
 
-/* Specific styling for video container */
-.video-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
+.card img,
+video {
+    display: block;
+    margin: 0 auto;
+    max-width: 300px;
+    height: auto;
+    margin-bottom: 20px;
+    border-radius: 8px;
 }
 
-.video-container iframe {
-    max-width: 100%;
-    width: 560px;
-    /* Adjust width as needed */
-    height: 315px;
-    /* Adjust height as needed */
-}
 
 /* Footer styling */
 footer {
@@ -120,6 +118,23 @@ footer p {
     font-size: 0.9rem;
 }
 
+/* Flex container to align images side by side without cropping */
+.image-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    /* Space between images */
+}
+
+.image-container img {
+    /* Set to fit both images within the container */
+    height: 45%;
+    width: auto;
+    /* Preserve natural aspect ratio */
+    border-radius: 8px;
+}
+
+
 /* Responsive layout */
 @media (max-width: 768px) {
     .hero img {
@@ -128,10 +143,5 @@ footer p {
 
     .card {
         padding: 10px;
-    }
-
-    .video-container iframe {
-        width: 100%;
-        height: auto;
     }
 }

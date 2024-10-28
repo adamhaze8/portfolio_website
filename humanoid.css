@@ -118,6 +118,23 @@ footer p {
     font-size: 0.9rem;
 }
 
+/* Flex container to align images side by side without cropping */
+.image-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    /* Space between images */
+}
+
+.image-container img {
+    /* Set to fit both images within the container */
+    height: 45%;
+    width: auto;
+    /* Preserve natural aspect ratio */
+    border-radius: 8px;
+}
+
+
 /* Responsive layout */
 @media (max-width: 768px) {
     .hero img {
