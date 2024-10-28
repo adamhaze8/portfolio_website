@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Semi-Humanoid Robot Project by Adam Hazenberg">
     <title>Semi-Humanoid Robot - Adam Hazenberg</title>
-    <link rel="stylesheet" href="humanoid.css">
+    <link rel="stylesheet" href="magnus.css">
     <style>
         /* General reset and body styling */
         * {
@@ -136,7 +136,7 @@
             <img src="images/profile_picture.jpg" alt="Adam Hazenberg">
             <div class="profile-info">
                 <h1>Adam Hazenberg</h1>
-                <h2>Robotics Engineer & Developer</h2>
+                <h2>Robotics Engineering Undergrad Student</h2>
             </div>
         </div>
         <nav>
@@ -148,12 +148,24 @@
         <!-- Intro paragraph on its own card -->
         <section class="project-section">
             <div class="card">
-                <h2>Magnus (HEBI Robotics)</h2>
+                <h2>Magnus</h2>
                 </br>
-                <p>Magnus is a novel mobile robot engineered to climb large ferromagnetic structures with versatility,
+                <p>During the summer of 2024, I had the priviledge of working alongside world-class roboticists at HEBI
+                    Robotics, where my main project was the creation of Magnus. Magnus is a novel mobile robot
+                    engineered to climb large ferromagnetic structures with versatility,
                     operating autonomously or via remote control based on structural complexity. It features a 5-DOF
                     arm, symmetric around the elbow/middle joint, and uses magnetic pads at both its base and end
                     effector to adhere to surfaces.</p>
+                <figure class="image-caption">
+                    <img src="images/Hebi.jpg" width="150" height="auto" alt="HEBI Logo">
+                    <figcaption>
+                        <a href="https://hebi.us" target="_blank">HEBI Robotics official website</a>
+                    </figcaption>
+                </figure>
+
+
+
+
             </div>
         </section>
         <!-- Hardware Design Section -->
@@ -184,7 +196,9 @@
                     <p><strong>Autonomous Movement:</strong> Added robot autonomy, enabling Magnus to move to any 2D
                         position on a planar surface.</p>
                     <p><strong>Surface Transitions:</strong> Integrated automatic transitions between ground, wall, and
-                        ceiling surfaces, allowing the robot to navigate complex environments.</p>
+                        ceiling surfaces, allowing the robot to navigate complex environments. To complete these
+                        transitions safely, the robot takes advantage of the torque sensing capabilites of HEBI
+                        actuators to feel and find the relative slope of perpendicular surfaces.</p>
                     </br>
 
                     <!-- Centering the iframe using a div and text-align -->
@@ -207,6 +221,11 @@
 
     <footer>
         <p>&copy; 2024 Adam Hazenberg</p>
+        <p>
+            <a href="mailto:adamhaze8@gmail.com">Email</a> |
+            <a href="https://www.linkedin.com/in/adamhazenberg" target="_blank">LinkedIn</a> |
+            <a href="https://github.com/adamhaze8" target="_blank">GitHub</a>
+        </p>
     </footer>
 </body>
 

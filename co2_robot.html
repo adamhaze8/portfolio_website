@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="CO2 Mapping Mobile Robot Project by Adam Hazenberg">
     <title>CO2 Mapping Mobile Robot - Adam Hazenberg</title>
-    <link rel="stylesheet" href="humanoid.css">
+    <link rel="stylesheet" href="co2_robot.css">
     <style>
         /* General reset and body styling */
         * {
@@ -120,7 +120,7 @@
             <img src="images/profile_picture.jpg" alt="Adam Hazenberg">
             <div class="profile-info">
                 <h1>Adam Hazenberg</h1>
-                <h2>Robotics Engineer & Developer</h2>
+                <h2>Robotics Engineering Undergrad Student</h2>
             </div>
         </div>
         <nav>
@@ -133,28 +133,47 @@
         <section class="project-section">
             <div class="card">
                 <h2>CO2 Concentration Mapping Mobile Robot</h2>
-                <p>The objective is to create a cost-effective mobile robotic solution for Property Management firms,
+                <br>
+                <p>The objective was to create a cost-effective mobile robotic solution for Property Management firms,
                     enhancing the efficiency of indoor CO2 concentration monitoring compared to existing market
-                    offerings.</p>
+                    offerings. Constructed a comprehensive business case, assessed the economic
+                    life cycle, and conducted a thorough market analysis for the mobile robot.</p>
             </div>
         </section>
 
         <!-- Key Accomplishments Section -->
         <section class="project-section">
             <div class="card">
-                <h3>Key Accomplishments</h3>
+                <h3>Software</h3>
                 <ul style="padding-left: 20px;">
-                    <li><strong>Software Stack:</strong> Devised a software stack in ROS using Python for generating CO2
-                        concentration maps on a remotely operated mobile robot.</li>
-                    <li><strong>SLAM Technology:</strong> Employed SLAM technology to derive the robot's position from
-                        laser scan data, enabling correlation with CO2 measurements and subsequent interpolation for
-                        smooth data visualization.</li>
+                    <p>Created a ROS2 stack to control the robot while periodically
+                        taking Co2 measuremnts. This invlolved using RVIZ to derive the location of the robot within the
+                        room, then creating a Python algorithm to interpoate the concentration data on a 2D plane. </p>
+                    <br>
                     <div class="image-container">
                         <img src="images/slam_map.jpg" alt="SLAM Map">
-                        <img src="images/humanoid_head_iterations.jpg" alt="Head Iterations of the Semi-Humanoid Robot">
+                        <img src="images/heat_map.jpeg" alt="Heat Map">
                     </div>
-                    <li><strong>Business Case:</strong> Constructed a comprehensive business case, assessed the economic
-                        life cycle, and conducted a thorough market analysis for the mobile robot.</li>
+                    <p>The full software-hardware integration can be illustrated as follows:</p>
+                    <br>
+                    <img src="images/co2_mapping_block_diagram.png" width="70%" height="auto" alt="block diagram">
+                </ul>
+            </div>
+        </section>
+        <section class="project-section">
+            <div class="card">
+                <h3>Hardware</h3>
+                <ul style="padding-left: 20px;">
+                    <p>Used a small Lynxmotion differential drive robot to take data measurements at different spots in
+                        the room. Additional task specific hardware included:</p>
+                    <ul style="padding-left: 30px;">
+                        <li>Raspberry Pi 4</li>
+                        <li>RPLIDAR SLAM lidar sensor</li>
+                        <li>C02 concentration sensor</li>
+                        <li>Arduino Uno</lili>
+                        <li>Logitec game controller</li>
+                    </ul>
+                    <img src="images/co2_robot_labelled.png" width="70%" height="auto" alt="SLAM Map">
                 </ul>
             </div>
         </section>
@@ -162,6 +181,11 @@
 
     <footer>
         <p>&copy; 2024 Adam Hazenberg</p>
+        <p>
+            <a href="mailto:adamhaze8@gmail.com">Email</a> |
+            <a href="https://www.linkedin.com/in/adamhazenberg" target="_blank">LinkedIn</a> |
+            <a href="https://github.com/adamhaze8" target="_blank">GitHub</a>
+        </p>
     </footer>
 </body>
 

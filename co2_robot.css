@@ -163,43 +163,12 @@ footer p {
    Sets a fixed height, scales width proportionally to maintain aspect ratio, 
    and ensures image does not exceed container width */
 .image-container img {
-    height: 500px;
+    height: 300px;
     width: auto;
     max-width: 100%;
     border-radius: 8px;
     object-fit: cover;
 }
-
-figure {
-    display: flex;
-    flex-direction: column;
-    /* Stack image and caption vertically */
-    align-items: center;
-    /* Center both image and caption horizontally */
-    text-align: center;
-    /* Center text in the figcaption */
-    margin: 20px;
-    /* Optional: Add margin around the figure */
-}
-
-figcaption {
-    margin-top: 0px;
-    /* Space between image and caption */
-    font-size: 14px;
-    color: #555;
-    /* Optional: Customize caption color */
-}
-
-figcaption a {
-    color: #007bff;
-    /* Customize link color */
-    text-decoration: none;
-}
-
-figcaption a:hover {
-    text-decoration: underline;
-}
-
 
 /* Responsive styling for medium screens (768px or less):
    Adjusts hero image width and reduces padding for project cards */
