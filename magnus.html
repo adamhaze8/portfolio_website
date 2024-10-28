@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Semi-Humanoid Robot Project by Adam Hazenberg">
+    <title>Semi-Humanoid Robot - Adam Hazenberg</title>
+    <link rel="stylesheet" href="humanoid.css">
+    <style>
+        /* General reset and body styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        /* Header and navigation styling */
+        header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Profile Image */
+        .profile-img {
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-img img {
+            border-radius: 50%;
+            width: 100px;
+            height: auto;
+            margin-right: 15px;
+            border: 3px solid #fff;
+        }
+
+        /* Name and Subtitle */
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-info h1 {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+
+        .profile-info h2 {
+            font-size: 1.2rem;
+            font-weight: 300;
+        }
+
+        /* Navigation Links */
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        /* Card Styling */
+        .card {
+            background-color: #fff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Content inside card */
+        .card h2,
+        .card p {
+            text-align: left;
+        }
+
+        /* Featured Projects Section */
+        .projects-section {
+            background-color: #deded5;
+            padding: 40px 20px;
+        }
+
+        .projects-section h3 {
+            color: #000000;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        footer {
+            background-color: #333;
+            color: #f5f5dc;
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        footer a {
+            color: #f5f5dc;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        footer p {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="profile-img">
+            <img src="images/profile_picture.jpg" alt="Adam Hazenberg">
+            <div class="profile-info">
+                <h1>Adam Hazenberg</h1>
+                <h2>Robotics Engineer & Developer</h2>
+            </div>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Intro paragraph on its own card -->
+        <section class="project-section">
+            <div class="card">
+                <h2>Magnus (HEBI Robotics)</h2>
+                <p>Magnus is a novel mobile robot engineered to climb large ferromagnetic structures with versatility,
+                    operating autonomously or via remote control based on structural complexity. It features a 5-DOF
+                    arm, symmetric around the elbow/middle joint, and uses magnetic pads at both its base and end
+                    effector to adhere to surfaces.</p>
+            </div>
+        </section>
+        <!-- Hardware Design Section -->
+        <section class="project-section">
+            <div class="card">
+                <h3>Hardware Design</h3>
+                <p><strong>Magnetic Pads:</strong> Designed magnetic pads that could be mechanically toggled for both
+                    surface attachment and detachment. The pads needed to securely hold the robot in various kinematic
+                    and dynamic configurations while remaining light enough for the robot to lift its own weight. One
+                    major challenge was balancing the strength of magnetic adhesion with the need for a lightweight
+                    design. </p>
+                <p><strong>Tether-Free Operation:</strong> Removed the need for a tether by adding a Raspberry Pi and
+                    battery, allowing the robot to operate without external connections.</p>
+                <img src="images/magnus_tetherless.jpg" alt="Magnus HEBI Robotics Robot">
+            </div>
+        </section>
+        <!-- Software Development Section -->
+        <section class="project-section">
+            <div class="card">
+                <h3>Software Development</h3>
+                <p><strong>Manual Control:</strong> Implemented manual control and determined the appropriate
+                    spatial frames of reference for mapping joystick controls for the most intuitive user
+                    experience.</p>
+                <p><strong>Stepping Algorithms:</strong> Experimented with various stepping algorithms in MATLAB
+                    for semi-manual or autonomous movement of the robot.</p>
+                <p><strong>Autonomous Movement:</strong> Added robot autonomy, enabling Magnus to move to any 2D
+                    position on a planar surface.</p>
+                <p><strong>Surface Transitions:</strong> Integrated automatic transitions between ground, wall, and
+                    ceiling surfaces, allowing the robot to navigate complex environments.</p>
+                </br>
+                <video controls>
+                    <source src="videos/magnus_demo.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <p><strong>Wireless Control:</strong> In the final stage, ported the software to Python to enable
+                    wireless control of the robot.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Adam Hazenberg</p>
+    </footer>
+</body>
+
+</html>

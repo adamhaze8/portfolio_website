@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CO2 Mapping Mobile Robot Project by Adam Hazenberg">
+    <title>CO2 Mapping Mobile Robot - Adam Hazenberg</title>
+    <link rel="stylesheet" href="humanoid.css">
+    <style>
+        /* General reset and body styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        /* Header and navigation styling */
+        header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Profile Image */
+        .profile-img {
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-img img {
+            border-radius: 50%;
+            width: 100px;
+            height: auto;
+            margin-right: 15px;
+            border: 3px solid #fff;
+        }
+
+        /* Name and Subtitle */
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-info h1 {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+
+        .profile-info h2 {
+            font-size: 1.2rem;
+            font-weight: 300;
+        }
+
+        /* Navigation Links */
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        /* Card Styling */
+        .card {
+            background-color: #fff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Content inside card */
+        .card h2,
+        .card h3,
+        .card p {
+            text-align: left;
+        }
+
+        /* Footer styling */
+        footer {
+            background-color: #333;
+            color: #f5f5dc;
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        footer a {
+            color: #f5f5dc;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+
+        footer p {
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="profile-img">
+            <img src="images/profile_picture.jpg" alt="Adam Hazenberg">
+            <div class="profile-info">
+                <h1>Adam Hazenberg</h1>
+                <h2>Robotics Engineer & Developer</h2>
+            </div>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Intro paragraph on its own card -->
+        <section class="project-section">
+            <div class="card">
+                <h2>CO2 Concentration Mapping Mobile Robot</h2>
+                <p>The objective is to create a cost-effective mobile robotic solution for Property Management firms,
+                    enhancing the efficiency of indoor CO2 concentration monitoring compared to existing market
+                    offerings.</p>
+            </div>
+        </section>
+
+        <!-- Key Accomplishments Section -->
+        <section class="project-section">
+            <div class="card">
+                <h3>Key Accomplishments</h3>
+                <ul style="padding-left: 20px;">
+                    <li><strong>Software Stack:</strong> Devised a software stack in ROS using Python for generating CO2
+                        concentration maps on a remotely operated mobile robot.</li>
+                    <li><strong>SLAM Technology:</strong> Employed SLAM technology to derive the robot's position from
+                        laser scan data, enabling correlation with CO2 measurements and subsequent interpolation for
+                        smooth data visualization.</li>
+                    <li><strong>Business Case:</strong> Constructed a comprehensive business case, assessed the economic
+                        life cycle, and conducted a thorough market analysis for the mobile robot.</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Adam Hazenberg</p>
+    </footer>
+</body>
+
+</html>
