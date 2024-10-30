@@ -6,128 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Semi-Humanoid Robot Project by Adam Hazenberg">
     <title>Semi-Humanoid Robot - Adam Hazenberg</title>
-    <link rel="stylesheet" href="humanoid.css">
-    <style>
-        /* General reset and body styling */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
-        }
-
-        /* Header and navigation styling */
-        header {
-            background-color: #007bff;
-            color: #fff;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        /* Profile Image */
-        .profile-img {
-            display: flex;
-            align-items: center;
-        }
-
-        .profile-img img {
-            border-radius: 50%;
-            width: 100px;
-            height: auto;
-            margin-right: 15px;
-            border: 3px solid #fff;
-        }
-
-        /* Name and Subtitle */
-        .profile-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .profile-info h1 {
-            font-size: 2.5rem;
-            margin-bottom: 5px;
-        }
-
-        .profile-info h2 {
-            font-size: 1.2rem;
-            font-weight: 300;
-        }
-
-        /* Navigation Links */
-        nav {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        nav a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 1rem;
-        }
-
-        /* Card Styling */
-        .card {
-            background-color: #fff;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Content inside card */
-        .card h2,
-        .card p {
-            text-align: left;
-        }
-
-        /* Featured Projects Section */
-        .projects-section {
-            background-color: #deded5;
-            padding: 40px 20px;
-        }
-
-        .projects-section h3 {
-            color: #000000;
-            font-size: 2rem;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        footer {
-            background-color: #333;
-            color: #f5f5dc;
-            padding: 20px 0;
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        footer a {
-            color: #f5f5dc;
-            text-decoration: none;
-            margin: 0 15px;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        footer p {
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -148,7 +27,7 @@
         <!-- Intro paragraph on its own card -->
         <section class="project-section">
             <div class="card">
-                <h2>Semi-Humanoid Robot</h2>
+                <h1>Semi-Humanoid</h1>
                 <p>This personal project was both a passion project and an opportunity to acquire new technical skills.
                     Since the summer after my first year, I have been developing a human-interaction robot that can
                     interpret, respond to, and follow basic commands from humans. The project started as a simple
@@ -159,7 +38,7 @@
 
         <section class="project-section">
             <div class="card">
-                <h3>Perception System</h3>
+                <h1>Perception System</h1>
                 <p>The challenge for the perception system was to find low-cost solutions for a large variety of sensing
                     requirements. For the majority of high-level operations, both object detection and accurate distance
                     measurement were necessary. At first, I tried stereo vision, but this proved to be too
@@ -167,9 +46,8 @@
                     obstacles and walls. For this reason, I pivoted to a combination of a single-laser LIDAR sensor
                     aligned with a webcam. To lighten the computational load on the Raspberry Pi, I added a Coral TPU
                     accelerator. The primary model used for object detection is MobileNetV2</p>
-                <br>
                 <p>Other sensors in the suite/head include:</p>
-                <ul style="padding-left: 30px;">
+                <ul>
                     <li>GPS and digital compass for outdoor navigation</li>
                     <li>IMU for linear actuator zeroing and PID control</li>
                     <li>Microphone for speech recognition</li>
@@ -184,20 +62,20 @@
 
         <section class="project-section">
             <div class="card">
-                <h3>Mechanical Structure</h3>
+                <h1>Mechanical Structure</h1>
                 <p>Due to the scale of the robot (1.75m), it was a challenge to design a structure that would minimize
                     weight and cost while maintaining rigidity. Additionally, the design needed to be modular to support
                     design adjustments (of which there were many). For this reason, T-slot extrusion rails were employed
                     for the central structure. Linear actuator leaning joints were CNC-machined from aluminum to prevent
                     undermining the rigidity of the rest of the structure.</p>
-                <img src="images/humanoid_full.png" alt="Full Semi-Humanoid Robot">
+                <img src="images/humanoid_full.png" width="40%" height="auto" alt="Full Semi-Humanoid Robot">
             </div>
         </section>
 
         <section class="project-section">
             <div class="card">
-                <h3>Notable Capabilities/Subroutines</h3>
-                <strong>Grabbing objects</strong><br>
+                <h1>Notable Capabilities/Subroutines</h1>
+                <h3>Grabbing objects</h3>
                 <p>The grabbing subroutine makes use of the camera mounted on the gripper to converge the end effector
                     towards the object being grabbed. Using forward kinematics, the arm knows its current spatial state,
                     and from the pose of the item within the frame, the arm can determine its next desired position. If
@@ -205,8 +83,8 @@
                     item is aligned. The arm then calculates the joint position with inverse kinematics and does this
                     repeatedly until an IR sensor is triggered, and the gripper is closed. This seems to work well for
                     items less than 12cm in width.</p>
-                <img src="images/humanoid_gripper.png" alt="Full Semi-Humanoid Robot">
-                <strong>Approaching/following objects</strong>
+                <img src="images/humanoid_gripper.png" width="30%" height="auto" alt="Full Semi-Humanoid Robot">
+                <h3>Approaching/following objects</h3>
                 <p>Another useful subroutine is the ability to approach items after they have been identified. This may
                     include following a person or approaching an item to be manipulated. In both cases, the robot tracks
                     the desired item with a pan/tilt look-at routine (running in a separate thread) and uses this pose
@@ -215,12 +93,12 @@
                     into a PID controller. This controller then outputs a wheel speed differential to drive the robot
                     towards the target. The robot can then use the Lidar sensor and neck angle to calculate and
                     stop at the specified distance.</p>
-                <br>
-                <video src="videos/humanoid_driving.mp4" alt="Humanoid Driving" autoplay muted loop playsinline>
+                <video src="videos/humanoid_driving.mp4" width="40%" height="auto" alt="Humanoid Driving" autoplay muted
+                    loop playsinline>
                     Your browser does not support the video tag.
                 </video>
 
-                <strong>Area scanning for desired object</strong><br>
+                <h3>Area scanning for desired object</h3>
                 <p>For any larger routine such as fetching items or finding people, the robot is programmed with a
                     function that pans the head in the motion of a sinusoid, while the CV model attempts to find the
                     desired item. When the item is detected, the routine will then pan/tilt toward the item to create

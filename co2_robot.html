@@ -6,112 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="CO2 Mapping Mobile Robot Project by Adam Hazenberg">
     <title>CO2 Mapping Mobile Robot - Adam Hazenberg</title>
-    <link rel="stylesheet" href="co2_robot.css">
-    <style>
-        /* General reset and body styling */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
-        }
-
-        /* Header and navigation styling */
-        header {
-            background-color: #007bff;
-            color: #fff;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        /* Profile Image */
-        .profile-img {
-            display: flex;
-            align-items: center;
-        }
-
-        .profile-img img {
-            border-radius: 50%;
-            width: 100px;
-            height: auto;
-            margin-right: 15px;
-            border: 3px solid #fff;
-        }
-
-        /* Name and Subtitle */
-        .profile-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .profile-info h1 {
-            font-size: 2.5rem;
-            margin-bottom: 5px;
-        }
-
-        .profile-info h2 {
-            font-size: 1.2rem;
-            font-weight: 300;
-        }
-
-        /* Navigation Links */
-        nav {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        nav a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 1rem;
-        }
-
-        /* Card Styling */
-        .card {
-            background-color: #fff;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Content inside card */
-        .card h2,
-        .card h3,
-        .card p {
-            text-align: left;
-        }
-
-        /* Footer styling */
-        footer {
-            background-color: #333;
-            color: #f5f5dc;
-            padding: 20px 0;
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        footer a {
-            color: #f5f5dc;
-            text-decoration: none;
-            margin: 0 15px;
-        }
-
-        footer p {
-            font-size: 0.9rem;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -132,8 +27,7 @@
         <!-- Intro paragraph on its own card -->
         <section class="project-section">
             <div class="card">
-                <h2>CO2 Concentration Mapping Mobile Robot</h2>
-                <br>
+                <h1>CO2 Concentration Mapping Mobile Robot</h1>
                 <p>The objective was to create a cost-effective mobile robotic solution for Property Management firms,
                     enhancing the efficiency of indoor CO2 concentration monitoring compared to existing market
                     offerings. Constructed a comprehensive business case, assessed the economic
@@ -144,29 +38,27 @@
         <!-- Key Accomplishments Section -->
         <section class="project-section">
             <div class="card">
-                <h3>Software</h3>
+                <h1>Software</h1>
                 <ul style="padding-left: 20px;">
                     <p>Created a ROS2 stack to control the robot while periodically
                         taking Co2 measuremnts. This invlolved using RVIZ to derive the location of the robot within the
-                        room, then creating a Python algorithm to interpoate the concentration data on a 2D plane. </p>
-                    <br>
+                        room, then creating a Python algorithm to interpolate the concentration data on a 2D plane. </p>
                     <div class="image-container">
                         <img src="images/slam_map.jpg" alt="SLAM Map">
                         <img src="images/heat_map.jpeg" alt="Heat Map">
                     </div>
                     <p>The full software-hardware integration can be illustrated as follows:</p>
-                    <br>
                     <img src="images/co2_mapping_block_diagram.png" width="70%" height="auto" alt="block diagram">
                 </ul>
             </div>
         </section>
         <section class="project-section">
             <div class="card">
-                <h3>Hardware</h3>
-                <ul style="padding-left: 20px;">
+                <h1>Hardware</h1>
+                <ul>
                     <p>Used a small Lynxmotion differential drive robot to take data measurements at different spots in
                         the room. Additional task specific hardware included:</p>
-                    <ul style="padding-left: 30px;">
+                    <ul>
                         <li>Raspberry Pi 4</li>
                         <li>RPLIDAR SLAM lidar sensor</li>
                         <li>C02 concentration sensor</li>
