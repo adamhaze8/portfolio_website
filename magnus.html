@@ -25,72 +25,65 @@
 
     <main>
         <!-- Intro paragraph on its own card -->
-        <section class="project-section">
-            <div class="card">
-                <h1>Magnus</h1>
-                <p>During the summer of 2024, I had the priviledge of working alongside world-class roboticists at HEBI
-                    Robotics, where my main project was the creation of Magnus. Magnus is a novel mobile robot
-                    engineered to climb large ferromagnetic structures with versatility,
-                    operating autonomously or via remote control based on structural complexity. It features a 5-DOF
-                    arm, symmetric around the elbow/middle joint, and uses magnetic pads at both its base and end
-                    effector to adhere to surfaces.</p>
-                <figure class="image-caption">
-                    <img src="images/Hebi.jpg" width="150" height="auto" alt="HEBI Logo">
-                    <figcaption>
-                        <a href="https://hebi.us" target="_blank">HEBI Robotics official website</a>
-                    </figcaption>
-                </figure>
-
-
-
-
-            </div>
+        <section class="card">
+            <h1>Magnus</h1>
+            <p>During the summer of 2024, I had the priviledge of working alongside world-class roboticists at HEBI
+                Robotics, where my main project was the creation of Magnus. Magnus is a novel mobile robot
+                engineered to climb large ferromagnetic structures with versatility,
+                operating autonomously or via remote control based on structural complexity. It features a 5-DOF
+                arm, symmetric around the elbow/middle joint, and actuates magnetic pads at both its base and end
+                effector to adhere to surfaces.</p>
+            <figure class="image-caption">
+                <img src="images/Hebi.jpg" width="150" height="auto" alt="HEBI Logo">
+                <figcaption>
+                    <a href="https://hebi.us" target="_blank">HEBI Robotics official website</a>
+                </figcaption>
+            </figure>
         </section>
         <!-- Hardware Design Section -->
-        <section class="project-section">
-            <div class="card">
-                <h1>Hardware Design</h1>
-                <p><strong>Magnetic Pads:</strong> Designed magnetic pads that could be mechanically toggled for both
-                    surface attachment and detachment. The pads needed to securely hold the robot in various kinematic
-                    and dynamic configurations while remaining light enough for the robot to lift its own weight. One
-                    major challenge was balancing the strength of magnetic adhesion with the need for a lightweight
-                    design. </p>
-                <p><strong>Tether-Free Operation:</strong> Removed the need for a tether by adding a Raspberry Pi and
-                    battery, allowing the robot to operate without external connections.</p>
-                <div class="image-container">
-                    <img src="images/magnus_tetherless.jpg" alt="Tetherless Magnus Robot">
-                    <img src="images/magnus_stretched.jpg" alt="Stretched Magnus Robot">
-                </div>
+        <section class="card">
+            <h1>Hardware Design</h1>
+            <p><strong>Magnetic Pads:</strong> Designed magnetic pads that could be mechanically toggled for both
+                surface attachment and detachment. The pads needed to securely hold the robot in various kinematic
+                and dynamic configurations while remaining light enough for the robot to lift its own weight. One
+                major challenge was balancing the strength of magnetic adhesion with the need for a lightweight
+                design. </p>
+            <p><strong>Tether-Free Operation:</strong> Removed the need for a tether by adding a Raspberry Pi and
+                battery, allowing the robot to operate without external connections.</p>
+            <div class="image-container">
+                <img src="images/magnus_tetherless.jpg" alt="Tetherless Magnus Robot">
+                <img src="images/magnus_stretched.jpg" alt="Stretched Magnus Robot">
             </div>
-            <section class="project-section">
-                <div class="card">
-                    <h1>Software Development</h1>
-                    <p><strong>Manual Control:</strong> Implemented manual control and determined the appropriate
-                        spatial frames of reference for mapping joystick controls for the most intuitive user
-                        experience.</p>
-                    <p><strong>Stepping Algorithms:</strong> Experimented with various stepping algorithms in MATLAB
-                        for semi-manual or autonomous movement of the robot.</p>
-                    <p><strong>Autonomous Movement:</strong> Added robot autonomy, enabling Magnus to move to any 2D
-                        position on a planar surface.</p>
-                    <p><strong>Surface Transitions:</strong> Integrated automatic transitions between ground, wall, and
-                        ceiling surfaces, allowing the robot to navigate complex environments. To complete these
-                        transitions safely, the robot takes advantage of the torque sensing capabilites of HEBI
-                        actuators to feel and find the relative slope of perpendicular surfaces.</p>
+        </section>
+        <section class="card">
+            <h1>Software Development</h1>
+            <p><strong>Manual Control:</strong> Implemented manual control and determined the appropriate
+                spatial frames of reference for mapping joystick controls for the most intuitive user
+                experience.</p>
+            <p><strong>Stepping Algorithms:</strong> Experimented with various stepping algorithms in MATLAB
+                for semi-manual or autonomous movement of the robot.</p>
+            <p><strong>Surface Transitions:</strong> Integrated automatic transitions between ground, wall, and
+                ceiling surfaces, allowing the robot to navigate complex environments. To complete these
+                transitions safely, the robot takes advantage of the torque sensing capabilites of HEBI
+                actuators to feel and find the relative slope of perpendicular surfaces.</p>
+            <p><strong>Magnus Class:</strong> Encasulated all previously developed functions into a Magnus class for
+                better software modularity and simplicity.
+            <p><strong>Autonomous Movement:</strong> Added robot autonomy, enabling Magnus to move to any 2D
+                position on a planar surface. These complex movements could be pre-programmed or constucted by the user
+                during operation via the UI</p>
 
-                    <!-- Centering the iframe using a div and text-align -->
-                    <div style="text-align: center;">
-                        <iframe width="560" height="315"
-                            src="https://www.youtube.com/embed/mEoObKs6Ssg?si=ZxGgOrJKTEXo64kh"
-                            title="YouTube video player" frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>style="border-radius: 50px;
-                            overflow: hidden;"></iframe>
-                    </div>
-                    <br>
-                    <p><strong>Wireless Control:</strong> In the final stage, ported the software to Python to enable
-                        wireless control of the robot.</p>
-                </div>
-            </section>
+            <!-- Centering the iframe using a div and text-align -->
+            <div style="text-align: center;">
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/mEoObKs6Ssg?si=ZxGgOrJKTEXo64kh"
+                    title="YouTube video player" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>style="border-radius: 50px;
+                    overflow: hidden;"></iframe>
+            </div>
+            <br>
+            <p><strong>Wireless Control:</strong> In the final stage, ported the software to Python to enable
+                wireless control of the robot. The Pytho script was run on a Raspberry Pi with Ubuntu</p>
+        </section>
 
 
     </main>

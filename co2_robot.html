@@ -36,49 +36,45 @@
         </section>
 
         <!-- Key Accomplishments Section -->
-        <section class="project-section">
-            <div class="card">
-                <h1>Software</h1>
-                <ul style="padding-left: 20px;">
-                    <p>Created a ROS2 stack to control the robot while periodically
-                        taking Co2 measuremnts. This invlolved using RVIZ to derive the location of the robot within the
-                        room, then creating a Python algorithm to interpolate the concentration data on a 2D plane. </p>
-                    <div class="image-container">
-                        <img src="images/slam_map.jpg" alt="SLAM Map">
-                        <img src="images/heat_map.jpeg" alt="Heat Map">
-                    </div>
-                    <p>The full software-hardware integration can be illustrated as follows:</p>
-                    <img src="images/co2_mapping_block_diagram.png" width="70%" height="auto" alt="block diagram">
-                </ul>
-            </div>
+        <section class="card">
+            <h1>Software</h1>
+            <ul style="padding-left: 20px;">
+                <p>Created a ROS2 stack to control the robot while periodically
+                    taking Co2 measuremnts. This invlolved using RViz to derive the location of the robot within the
+                    room, then creating a Python algorithm to interpolate the concentration data on a 2D plane. </p>
+                <div class="image-container">
+                    <img src="images/slam_map.jpg" alt="SLAM Map">
+                    <img src="images/heat_map.jpeg" alt="Heat Map">
+                </div>
+                <p>The full software-hardware integration can be illustrated as follows:</p>
+                <img src="images/co2_mapping_block_diagram.png" width="70%" height="auto" alt="block diagram">
+            </ul>
         </section>
-        <section class="project-section">
-            <div class="card">
-                <h1>Hardware</h1>
+        <section class="card">
+            <h1>Hardware</h1>
+            <ul>
+                <p>Used a small Lynxmotion differential drive robot to take data measurements at different spots in
+                    the room. Additional task specific hardware included:</p>
                 <ul>
-                    <p>Used a small Lynxmotion differential drive robot to take data measurements at different spots in
-                        the room. Additional task specific hardware included:</p>
-                    <ul>
-                        <li>Raspberry Pi 4</li>
-                        <li>RPLIDAR SLAM lidar sensor</li>
-                        <li>C02 concentration sensor</li>
-                        <li>Arduino Uno</lili>
-                        <li>Logitec game controller</li>
-                    </ul>
-                    <img src="images/co2_robot_labelled.png" width="70%" height="auto" alt="SLAM Map">
+                    <li>Raspberry Pi 4</li>
+                    <li>RPLiDAR SLAM LiDAR sensor</li>
+                    <li>Co2 concentration sensor</li>
+                    <li>Arduino Uno</lili>
+                    <li>Logitec game controller</li>
                 </ul>
-            </div>
+                <img src="images/co2_robot_labelled.png" width="70%" height="auto" alt="SLAM Map">
+            </ul>
         </section>
     </main>
-
-    <footer>
-        <p>&copy; 2024 Adam Hazenberg</p>
-        <p>
-            <a href="mailto:adamhaze8@gmail.com">Email</a> |
-            <a href="https://www.linkedin.com/in/adamhazenberg" target="_blank">LinkedIn</a> |
-            <a href="https://github.com/adamhaze8" target="_blank">GitHub</a>
-        </p>
-    </footer>
 </body>
+
+<footer>
+    <p>&copy; 2024 Adam Hazenberg</p>
+    <p>
+        <a href="mailto:adamhaze8@gmail.com">Email</a> |
+        <a href="https://www.linkedin.com/in/adamhazenberg" target="_blank">LinkedIn</a> |
+        <a href="https://github.com/adamhaze8" target="_blank">GitHub</a>
+    </p>
+</footer>
 
 </html>

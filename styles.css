@@ -20,6 +20,7 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 20px;
 }
 
 /* Profile Image */
@@ -85,12 +86,6 @@ nav a {
     color: #333;
 }
 
-/* Projects section: container, title, and grid layout */
-.projects-section {
-    background-color: #deded5;
-    padding: 40px 20px;
-}
-
 .projects-section h3 {
     color: #000000;
     font-size: 2rem;
@@ -99,10 +94,54 @@ nav a {
 }
 
 
+.about-me-content {
+    text-align: center;
+}
+
+.about-content h3 {
+    font-size: 2rem;
+    color: #007bff;
+    margin-bottom: 15px;
+}
+
+.about-content p {
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+
 .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+/* Styling for the text-columns */
+.text-columns {
+    display: flex;
+    /* Use flexbox to align columns */
+    gap: 20px;
+    /* Space between columns */
+}
+
+/* Styling for each column */
+.column {
+    flex: 1;
+    /* Each column takes up equal space */
+}
+
+/* Optional styling for the list */
+.column ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+.column li {
+    margin-bottom: 10px;
 }
 
 /* Project card styling */
@@ -143,10 +182,6 @@ nav a {
     color: #666;
 }
 
-.project-section p {
-    margin-bottom: 20px;
-}
-
 
 .project-card .date {
     font-size: 0.8rem;
@@ -154,21 +189,18 @@ nav a {
     margin-top: auto;
 }
 
-/* Spacing for top and bottom of project section */
-.project-section {
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
-
 /* Card styling: general styling for cards, max width, padding */
 .card {
+    margin-top: 20px;
+    margin-bottom: 20px;
     background-color: #fff;
     padding: 20px;
-    margin-bottom: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 1200px;
-    margin: 0 auto;
+}
+
+.card p {
+    margin-bottom: 20px;
 }
 
 .card h1,

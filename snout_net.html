@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CO2 Mapping Mobile Robot Project by Adam Hazenberg">
+    <title>CO2 Mapping Mobile Robot - Adam Hazenberg</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="profile-img">
+            <img src="images/profile_picture.jpg" alt="Adam Hazenberg">
+            <div class="profile-info">
+                <h1>Adam Hazenberg</h1>
+                <h2>Robotics Engineering Undergrad Student</h2>
+            </div>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="project-section">
+            <div class="card">
+                <h1>ELEC 475 Lab 2: SnoutNet</h1>
+                <p>Developed a convolutional neural network architecture, SnoutNet, designed for image-based tasks
+                    such as object localization. The project involved designing the network architecture, implementing a
+                    custom dataset using PyTorch, and training the model with data augmentation techniques to improve
+                    robustness.</p>
+            </div>
+        </section>
+
+        <section class="card">
+            <h1>Network Architecture</h1>
+            <p>SnoutNet combines convolutional and fully connected layers to process RGB images of size 227x227 pixels
+                and predict object coordinates. The architecture includes three convolutional layers with max-pooling,
+                followed by three fully connected layers, outputting the (x, y) coordinates of the object.</p>
+            <img src="images/snout_net_architecture.jpg" alt="Network Architecture Diagram" width="70%" height="auto">
+        </section>
+
+        <section class="card">
+            <h1>Data Augmentation</h1>
+            <p>Trained SnoutNet over 45 epochs using the Adam optimizer with a learning rate of 0.001. Implemented both
+                gaussian noise addition and random image flipping to investigate the effect of each
+                augmentation on the training results.</p>
+            <div class="image-container">
+                <img src="images/snout_net_image_original.png" alt="Original image">
+                <img src="images/snout_net_image_noise.png" alt="Image with noise">
+                <img src="images/snout_net_image_flip.png" alt="Image flipped">
+            </div>
+        </section>
+
+        <section class="card">
+            <h1>System Performance</h1>
+            <p>Performance analysis revealed that randomly flipping at p = 0.5 yielded the lowest mean error by
+                improving robustness to orientation changes. Noise augmentation added variability but was less effective
+                overall.
+                Challenges like overfitting were mitigated using these augmentation techniques.</p>
+            <div class="image-container">
+                <img src="images/snout_net_success_case_1.png" alt="Success case 1">
+                <img src="images/snout_net_faliure_case_1.png" alt="Faliure case 1">
+                <img src="images/snout_net_success_case_2.png" alt="Success case 2">
+                <img src="images/snout_net_faliure_case_2.png" alt="Faliure case 2">
+                <img src="images/snout_net_success_case_3.png" alt="Success case 3">
+                <img src="images/snout_net_success_case_4.png" alt="Success case 4">
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Adam Hazenberg</p>
+        <p>
+            <a href="mailto:adamhaze8@gmail.com">Email</a> |
+            <a href="https://www.linkedin.com/in/adamhazenberg" target="_blank">LinkedIn</a> |
+            <a href="https://github.com/adamhaze8" target="_blank">GitHub</a>
+        </p>
+    </footer>
+</body>
+
+</html>
