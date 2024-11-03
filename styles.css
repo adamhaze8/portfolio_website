@@ -246,8 +246,8 @@ footer p {
 
 .video-container {
     position: relative;
-    width: 80%;
-    max-width: 500px;
+    width: 60%;
+    /*max-width: 1000px;
     /* Set a max-width to limit the size */
     padding-bottom: 56.25%;
     /* Aspect ratio: 16:9 */
