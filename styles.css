@@ -335,6 +335,10 @@ figcaption a:hover {
         font-size: 0.9rem;
     }
 
+    .card li {
+        font-size: 0.9rem;
+    }
+
     .text-columns {
         flex-direction: column;
     }
