@@ -80,7 +80,9 @@
                 item is aligned. The arm then calculates the joint position with inverse kinematics and does this
                 repeatedly until an IR sensor is triggered, and the gripper is closed. This seems to work well for
                 items less than 12cm in width.</p>
-            <img src="images/humanoid_gripper.png" width="30%" height="auto" alt="Full Semi-Humanoid Robot">
+            <div class="image-container">
+                <img src="images/humanoid_gripper.png" style="width: 30%; height: auto;" alt="Full Semi-Humanoid Robot">
+            </div>
             <h3>Approaching/following objects</h3>
             <p>Another useful subroutine is the ability to approach items after they have been identified. This may
                 include following a person or approaching an item to be manipulated. In both cases, the robot tracks
@@ -90,10 +92,12 @@
                 into a PID controller. This controller then outputs a wheel speed differential to drive the robot
                 towards the target. The robot can then use the LiDAR sensor and neck angle to calculate and
                 stop at the specified distance.</p>
-            <video src="videos/humanoid_driving.mp4" width="30%" height="auto" alt="Humanoid Driving" autoplay muted
-                loop playsinline>
-                Your browser does not support the video tag.
-            </video>
+            <div class="image-container">
+                <video src="videos/humanoid_driving.mp4" style="width: 30%; height: auto;" alt="Humanoid Driving"
+                    autoplay muted loop playsinline>
+                    Your browser does not support the video tag.
+                </video>
+            </div>
 
             <h3>Area scanning for desired object</h3>
             <p>For any larger routine such as fetching items or finding people, the robot is programmed with a
