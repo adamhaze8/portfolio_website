@@ -55,6 +55,34 @@
             </div>
         </section>
 
+        <section class="card">
+            <h1>Electronics</h1>
+            <p>The robot employs a wide variety of sensors, actuators, and computing units:</p>
+            <ul>
+                <li>Servos (8-11V)</li>
+                <li>Geared DC motors (24V)</li>
+                <li>Speech synthesis amplifier (12V)</li>
+                <li>Linear actuators (12V)</li>
+                <li>Arduino Mega microcontroller (12V)</li>
+                <li>Raspberry Pi 4 (5V)</li>
+                <li>All Sensors (3.3-5V)</li>
+            </ul>
+            <p>To accommodate the power voltage/amperage requirements for all these components, I designed a centralized
+                battery unit that outputs 6V, 12V, and 24V by connecting eight 6V lead-acid batteries in either series
+                or parallel. This proved to be an effective alternative to buck converters, which were current-limited.
+            </p>
+            <div class="image-container">
+                <img src="images/humanoid_battery_isometric.png" alt="Battery unit isometric">
+                <img src="images/humanoid_battery_diagram.jpg" alt="Battery unit top">
+            </div>
+            <p>To support the clean, stable 5V/3A required by the Raspberry Pi, a 5V buck converter with a feedback loop
+                is used. This ensures that the Raspberry Pi receives a consistent 5V, even when the battery unit is
+                partially depleted.
+            </p>
+            <div class="image-container">
+                <img src="images/humanoid_buck_converter.png" style="width: 30%; height: auto;" alt="Buck converter">
+            </div>
+        </section>
 
         <section class="card">
             <h1>Mechanical Structure</h1>
