@@ -343,3 +343,9 @@ figcaption a:hover {
         font-size: 0.9rem;
     }
 }
+
+@media (max-height: 768px) {
+    .fixed-image {
+        display: none;
+    }
+}
