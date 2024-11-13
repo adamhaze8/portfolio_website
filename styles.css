@@ -107,6 +107,18 @@ nav a {
     margin-bottom: 30px;
 }
 
+.fixed-image {
+    position: fixed;
+    top: 0px;
+    right: 200px;
+    /* Ensures the image stays on top */
+}
+
+.fixed-image img {
+    width: 200px;
+    height: auto;
+}
+
 .text-columns {
     display: flex;
     /* Use flexbox to align columns */
@@ -312,38 +324,22 @@ figcaption a:hover {
     .text-columns {
         flex-direction: column;
     }
+
+    .fixed-image {
+        display: none;
+    }
 }
 
-/* Responsive styles for small screens (480px or less) */
+/* Additional styles for small screens (480px or less) */
 @media (max-width: 480px) {
-
-    .profile-img img {
-        width: 70px;
-        height: auto;
-    }
-
-    .profile-info h1 {
-        font-size: 1.5rem;
-    }
-
-    .profile-info h2 {
-        font-size: 1rem;
-    }
 
     header nav a {
         font-size: 0.9rem;
         margin: 0 10px;
     }
 
-    .card p {
-        font-size: 0.9rem;
-    }
-
+    .card p,
     .card li {
         font-size: 0.9rem;
-    }
-
-    .text-columns {
-        flex-direction: column;
     }
 }
