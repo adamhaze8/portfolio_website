@@ -70,12 +70,14 @@
             <p>To accommodate the power voltage/amperage requirements for all these components, I designed a centralized
                 battery unit that outputs 6V, 12V, and 24V by connecting eight 6V lead-acid batteries in either series
                 or parallel. This proved to be an effective alternative to buck converters, which were current-limited.
+                One drawback of this design is that the 6V batteries must be rewired and charged in parallel to ensure
+                an even charge.
             </p>
             <div class="image-container">
                 <img src="images/humanoid_battery_isometric.png" alt="Battery unit isometric">
                 <img src="images/humanoid_battery_diagram.jpg" alt="Battery unit top">
             </div>
-            <p>To support the clean, stable 5V/3A required by the Raspberry Pi, a 5V buck converter with a feedback loop
+            <p>To support the clean, stable 5V/3A required by the Raspberry Pi, a buck converter with a feedback loop
                 is used. This ensures that the Raspberry Pi receives a consistent 5V, even when the battery unit is
                 partially depleted.
             </p>
