@@ -110,12 +110,12 @@ nav a {
 .fixed-image {
     position: fixed;
     top: 0px;
-    right: 200px;
+    right: 250px;
     /* Ensures the image stays on top */
 }
 
 .fixed-image img {
-    width: 200px;
+    width: 220px;
     height: auto;
 }
 
