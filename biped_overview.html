@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="1.1m, 55lb Custom 10-DOF Humanoid Biped by Adam Hazenberg">
+    <title>1.1m, 55lb Biped - Adam Hazenberg</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="profile-img">
+            <img src="images/profile_picture.jpg" alt="Adam Hazenberg">
+            <div class="profile-info">
+                <h1>Adam Hazenberg</h1>
+                <h2>Robotics Engineering Graduate</h2>
+            </div>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="https://github.com/adamhaze8" target="_blank">GitHub</a>
+        </nav>
+    </header>
+
+    <main class="doc-layout">
+
+        <aside class="doc-sidebar">
+            <h3>Architecture Report</h3>
+            <ul>
+                <li><a href="biped_overview.html" class="active">1. Executive Summary</a></li>
+                <li><a href="biped_actuators.html">2. Custom Actuators</a></li>
+                <li><a href="biped_mechanical.html">3. Mechanical & Kinematics</a></li>
+                <li><a href="biped_firmware.html">4. Firmware & Safety</a></li>
+                <li><a href="biped_simulation.html">5. Simulation & RL</a></li>
+                <li><a href="biped_deployment.html">6. Real-World Deployment</a></li>
+            </ul>
+        </aside>
+
+        <div class="doc-content">
+            <section class="card">
+                <h1 style="margin-top: 0;">1. Executive Summary & Career Context</h1>
+
+                <h3>Motivation & Project Origin</h3>
+                <p>Developing a dynamically balancing bipedal humanoid is notoriously one of the most punishing
+                    challenges in robotics. While industry leaders like Figure AI have raised over $1 billion to tackle
+                    these challenges and companies like Tesla commit massive capital expenditures toward humanoid
+                    development, my motivation was driven by a deep-seated obsession with the field and a desire to
+                    tackle the problem from first principles.</p>
+                <p>Rather than relying on expensive, off-the-shelf integrated actuators, this platform was intentionally
+                    engineered from scratch. By designing custom cycloidal transmissions and native impedance
+                    controllers from raw components, the objective was to maximize learning across the entire robotics
+                    stack—from machining raw aluminum to deploying complex reinforcement learning policies—embracing the
+                    immense difficulty of the process regardless of whether the final hardware walked or fell.</p>
+
+                <h3>Project Objective</h3>
+                <p>To design, manufacture, and program a 10-DOF bipedal humanoid capable of dynamic balancing and robust
+                    fall recovery. Originally scoped for a 0.8m to 1.3m form factor, the final platform was optimized at
+                    1.1m and 22-25kg. A strict design constraint was enforced to engineer all mechanical and kinematic
+                    systems from scratch, limiting off-the-shelf sourcing exclusively to foundational electronic
+                    components such as raw brushless motors and microcontroller boards.</p>
+
+                <h3>Technical Approach</h3>
+                <ul>
+                    <li><strong>Hardware & Modular Actuation:</strong> The physical architecture prioritizes strict
+                        modularity to support rapid iteration. The custom cycloidal actuators were built on a fully
+                        parametric CAD foundation, allowing multiple torque profiles (e.g., 16:1 and 20:1) to be easily
+                        generated as scaled versions of a single core design. To balance weight and structural
+                        integrity, the actuator housings are 3D printed in PETG, while the high-stress cycloidal disks
+                        are CNC-machined from aluminum.</li>
+                    <li><strong>Kinematics & Mass Centralization:</strong> Drawing inspiration from platforms like
+                        Agility Robotics' Digit, the leg kinematics were explicitly designed to operate as a centralized
+                        pendulum. By utilizing a dual-stage belt transmission, the heavy ankle actuators are relocated
+                        to the mid-thigh. This drastically minimizes distal inertia at the extremities, unlocking the
+                        rapid swing-leg retraction speeds necessary for dynamic balancing.</li>
+                    <li><strong>Simulation & Control:</strong> Trained a robust zero-shot sim-to-real policy in Isaac
+                        Lab using PPO, supported by heavily shaped rewards, continuous action smoothing, and extensive
+                        domain randomization (variable latency, static/kinetic friction, and mass variation).</li>
+                </ul>
+
+                <h3>Key Achievements</h3>
+                <ul>
+                    <li><strong>Custom High-Torque Actuation:</strong> Developed fully integrated, zero-backlash
+                        cycloidal actuators capable of sustaining over 40 Nm of peak dynamic torque while providing
+                        high-fidelity state estimation via a dual-encoder architecture.</li>
+                    <li><strong>Physics-Accurate Simulation:</strong> Built an automated pipeline to extract true CAD
+                        inertial values and measured physical friction coefficients directly into the URDF, bridging the
+                        gap between hardware and the Isaac Lab environment.</li>
+                    <li><strong>Hardware Deployment:</strong> Conducted hardware testing by deploying the trained ONNX
+                        neural network onto the physical biped. These tests utilized a custom distributed impedance
+                        control network to execute the policy for brief periods of time, providing critical data for
+                        further sim-to-real refinement.</li>
+                </ul>
+
+                <div class="image-container">
+                    <video autoplay loop muted playsinline>
+                        <source src="videos/actuator_testing.mp4" type="video/mp4">
+                    </video>
+
+                    <video autoplay loop muted playsinline>
+                        <source src="videos/biped_training_1.mp4" type="video/mp4">
+                    </video>
+
+                    <video autoplay loop muted playsinline>
+                        <source src="videos/biped_walking_1.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </section>
+
+            <div class="doc-pagination right-only">
+                <a href="biped_mechanical.html">Next: Mechanical & Kinematics →</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Adam Hazenberg</p>
+        <p>
+            <a href="mailto:adamhaze8@gmail.com">Email</a> |
+            <a href="https://www.linkedin.com/in/adamhazenberg" target="_blank">LinkedIn</a> |
+            <a href="https://github.com/adamhaze8" target="_blank">GitHub</a>
+        </p>
+    </footer>
+</body>
+
+</html>

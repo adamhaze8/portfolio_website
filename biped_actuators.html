@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Custom Cycloidal Actuators for 1.1m, 55lb Biped">
+    <title>Actuators - 1.1m Biped</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="profile-img">
+            <img src="images/profile_picture.jpg" alt="Adam Hazenberg">
+            <div class="profile-info">
+                <h1>Adam Hazenberg</h1>
+                <h2>Robotics Engineering Graduate</h2>
+            </div>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="https://github.com/adamhaze8" target="_blank">GitHub</a>
+        </nav>
+    </header>
+
+    <main class="doc-layout">
+
+        <!-- SIDEBAR NAVIGATION (Updated to 6 pages) -->
+        <aside class="doc-sidebar">
+            <h3>Architecture Report</h3>
+            <ul>
+                <li><a href="biped_overview.html">1. Executive Summary</a></li>
+                <li><a href="biped_actuators.html" class="active">2. Custom Actuators</a></li>
+                <li><a href="biped_mechanical.html">3. Mechanical & Kinematics</a></li>
+                <li><a href="biped_firmware.html">4. Firmware & Safety</a></li>
+                <li><a href="biped_simulation.html">5. Simulation & RL</a></li>
+                <li><a href="biped_deployment.html">6. Real-World Deployment</a></li>
+            </ul>
+        </aside>
+
+        <!-- MAIN DOCUMENT CONTENT -->
+        <div class="doc-content">
+
+            <section class="card">
+                <h1 style="margin-top: 0;">Mechanical Design</h1>
+
+                <p>Developing high-torque, impact-resistant actuators from scratch was critical to this project.
+                    Standard planetary gearboxes were abandoned early in the design phase due to their inherent
+                    backlash. Cycloidal drives were selected specifically because their ultra-low backlash is a strict
+                    requirement for stable Reinforcement Learning (RL) sim-to-real transfer. Without a highly rigid,
+                    zero-slop drivetrain, the policy's high-frequency impedance commands would be lost or delayed before
+                    reaching the physical world, destroying simulation parity.</p>
+                <div class="image-container">
+                    <figure>
+                        <img src="images/large_actuator_cad.png" alt="CAD Model of the Large Joint Actuator">
+                        <figcaption>Large Actuator</figcaption>
+                    </figure>
+                    <figure>
+                        <img src="images/small_actuator_cad.png" alt="CAD Model of the Small Joint Actuator">
+                        <figcaption>Small Actuator</figcaption>
+                    </figure>
+                </div>
+
+                <p>High-fidelity state estimation is achieved through a dual-encoder architecture linked via a GT2
+                    timing belt. This setup connects the motor shaft directly to the gearbox output, allowing the system
+                    to simultaneously read the high-speed motor angle and the absolute output angle. To increase sensing
+                    resolution at the joint, the pulley system is geared so that the absolute output encoder rotates
+                    twice for every single full rotation of the physical output.</p>
+
+                <div class="image-container">
+                    <img src="images/dual_encoder.png" alt="Motor and Output Encoder Belt Linkage">
+                </div>
+
+                <p>Peak dynamic loads on the large joints will regularly exceed 40 Nm. To support this, the housing
+                    relies on large-diameter, thin-section output bearings (e.g., 60mm ID / 78mm OD on the large joints)
+                    to handle massive radial and axial moment loads. To minimize friction and guarantee a zero-backlash
+                    transmission, the cycloidal mechanism relies entirely on rolling contact. Every actuator, regardless
+                    of scale, utilizes exactly six M4 screws to mount the inner roller bearings to the output disk. The
+                    outer housing features a parametrically scaling array of 3mm inner-diameter bearings acting as the
+                    outer pins.</p>
+
+                <div class="image-container">
+                    <video autoplay loop muted playsinline>
+                        <source src="videos/cycloidal_gearbox_animation_1.mp4" type="video/mp4">
+                    </video>
+
+                    <video autoplay loop muted playsinline>
+                        <source src="videos/cycloidal_gearbox_animation_2.mp4" type="video/mp4">
+                    </video>
+                </div>
+
+                <p>Knowing the biped would require multiple actuator form factors (e.g., 16:1 for the large joints, 20:1
+                    for the small joints), the entire ecosystem is built on a fully parametric CAD architecture in
+                    Fusion 360. Rather than manually drafting discrete gearboxes, the assemblies are driven by strict
+                    mathematical constraints. Base variables like <code>gearRatio_Ref</code> and
+                    <code>eccentricity_Ref</code> automatically scale housing diameters, bearing clearances, and
+                    mounting patterns. Furthermore, the core cycloidal disk is generated natively via parametric sketch
+                    logic; the lobe profile is dynamically swept using a radial array driven by angular expressions tied
+                    directly to the gear ratio. This guarantees that the theoretical gear math perfectly matches the
+                    physical CAM geometry across all actuator sizes.
+                </p>
+                <div class="image-container">
+                    <img src="images/parameters_list.png" style="height: auto; width: 100%; max-width: 800px;"
+                        alt="List of Parameters Driving the Actuator Design">
+                    <img src="images/cycloidal_disk_generation.png" style="height: auto; width: 100%; max-width: 800px;"
+                        alt="Cycloidal Disk Generation via Parametric Sketch Logic">
+                </div>
+
+            </section>
+
+            <section class="card">
+                <h1 style="margin-top: 0;">Electronics</h1>
+
+                <h3>Motor Selection: G80 & G60 Gimbal Motors</h3>
+                <p>Before selecting the control electronics, the core powertrain had to be established. Rather than
+                    traditional high-speed brushless outrunners, G80 (KV60) and G60 (KV55) gimbal motors were chosen
+                    specifically for their high torque density and ultra-low KV ratings. Because cycloidal drives
+                    operate efficiently at lower gear ratios (e.g., 16:1 and 20:1), they require a motor that naturally
+                    outputs high torque at lower speeds. The G80 delivers a peak torque of 2.9 Nm at 16.3A, while the
+                    G60 delivers 1.75 Nm peak at 8.9A. These gimbal-style motors provide the exact direct-drive
+                    characteristics needed without relying on fragile, extreme-ratio gear sets.</p>
+
+                <h3>Motor Driver: ST B-G431B-ESC1</h3>
+                <p>
+                    The ST B-G431B-ESC1 was selected because it comfortably handles the robot's 24V power bus and can
+                    push up to 40A of peak phase current. This provides massive thermal headroom for the G80's 16.3A
+                    peak draw, ensuring the drivers won't overheat during continuous holding states. Beyond raw power,
+                    it packs a robust 3-phase inverter and an STM32G431 MCU into a footprint small enough to mount
+                    directly to the actuator housing. Crucially, this MCU features a hardware CORDIC math accelerator,
+                    allowing it to compute Field Oriented Control (FOC) algorithms with extremely low latency.
+                    Furthermore, while CAN bus is typical for distributed robotics, this board's onboard Micro USB was
+                    utilized for system communication. This completely eliminated the need for complex CAN transceiver
+                    soldering and allowed for highly convenient, direct-to-PC connections for rapid firmware debugging
+                    and FOC tuning.</p>
+                <h3>Motor Encoder: AS5047P (A/B Incremental)</h3>
+                <p>The motor shaft requires ultra-low latency tracking to prevent phase-lag during rapid torque
+                    transients. While a shared SPI bus between the two encoders would have been theoretically ideal, the
+                    highly compact B-G431B-ESC1 does not easily expose its SPI pins; utilizing them requires scraping
+                    solder mask off microscopic vias. To ensure physical reliability, the AS5047P instead communicates
+                    via an A/B Incremental interface. The ESC has native, easily accessible solder pads for this,
+                    providing the high-speed velocity data needed for commutation without hacking the board.</p>
+
+                <h3>Joint Output Encoder: AS5048A (PWM)</h3>
+                <p>The gearbox output moves slower but dictates the physical state of the robot. The AS5048A provides
+                    14-bit absolute magnetic sensing, meaning the biped knows its exact joint angles the millisecond it
+                    boots up without a homing sequence. Because the incremental pads were already utilized by the motor
+                    encoder, this sensor communicates via a PWM (Pulse Width Modulation) signal. This elegantly
+                    simplifies the wiring topology down to just a single communication wire, sidestepping the complex
+                    soldering requirements of SPI while still delivering reliable state data back to the RL policy.</p>
+
+                <div class="image-container">
+                    <img src="images/actuator_wiring_diagram.jpg" style="height: auto; width: 100%; max-width: 1000px;"
+                        class="img-large" alt="Actuator Wiring Diagram">
+                </div>
+
+
+
+            </section>
+
+            <section class="card">
+                <h1 style="margin-top: 0;">Firmware & Low-Level Control Strategy</h1>
+
+                <h3>The Sensor Fusion Pipeline</h3>
+                <p>Because Reinforcement Learning policies calculate joint dynamics based on the output of the gearbox,
+                    the STM32 must provide a clean 1:1 hardware map of the joint's state. The firmware fuses data from
+                    both encoders simultaneously. Absolute position (q) is polled directly from the AS5048A PWM joint
+                    encoder. However, because PWM sensors can introduce slight latency in velocity calculations, the
+                    joint velocity (dq) is derived by polling the high-speed AS5047P incremental motor encoder and
+                    dividing by the 16:1 gear ratio. Both signals are then passed through lightweight software low-pass
+                    filters to eliminate high-frequency noise before entering the control loop.</p>
+
+                <h3>Optimized Binary Telemetry & The Hardware Watchdog</h3>
+                <p>To run a stable 50Hz RL policy on the master PC, communication overhead with the nodes must be near
+                    zero. String-based serial communication was entirely abandoned in favor of tightly packed 12-byte
+                    C++ structs over a 115200-baud UART connection. This keeps latency in the sub-millisecond range.</p>
+
+                <p>Furthermore, testing neural networks on a heavy 24V robot makes PC software crashes inevitable. If
+                    the PC freezes while commanding maximum stiffness, the robot could violently thrash. To prevent
+                    this, a hardcoded 500ms hardware watchdog guarantees the joint defaults to a safe, highly viscous
+                    damping state if PC comms are lost.</p>
+
+                <pre
+                    style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 14px; margin: 20px 0;"><code>// 12-Byte Struct: PC -> STM32 (Optimized for pure impedance RL)
+struct __attribute__((packed)) RLCommand {
+  float q_des;
+  float kp;
+  float kd;
+} cmd = { 0.0f, 0.0f, 0.0f };
+
+// --- 4. SAFETY WATCHDOG ---
+// 0.5 seconds without PC comms triggers the damper
+if (millis() - last_command_time > WATCHDOG_TIMEOUT_MS) {
+  cmd.kp = 0.0f;
+  cmd.kd = SAFE_DAMPING_KD; 
+}</code></pre>
+
+                <h3>On-Board Impedance Control via SimpleFOC</h3>
+                <p>In standard robotics, computers often send position targets and let the motor driver figure out the
+                    rest. In dynamic locomotion, the PC sends impedance parameters (Target Position, Kp, and
+                    Kd), and the STM32 calculates the required effort. Running at high frequency, the firmware
+                    calculates the position and velocity errors, applies the commanded stiffness and damping, and
+                    converts that desired joint torque into a raw phase current command.</p>
+                <p>Rather than reinventing the wheel for motor commutation, this phase current target is passed directly
+                    into the open-source SimpleFOC library. SimpleFOC efficiently handles the complex
+                    Field Oriented Control (FOC) math, utilizing the STM32's hardware accelerators to physically drive
+                    the inverter bridge with extreme precision.</p>
+
+                <pre
+                    style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 14px; margin: 20px 0;"><code>// --- 5. IMPEDANCE CONTROL LAW ---
+float pos_error = cmd.q_des - state.q_curr;
+float vel_error = 0.0f - state.dq_curr;
+
+// Pure PD control, computing desired joint effort
+float joint_torque_nm = (cmd.kp * pos_error) + (cmd.kd * vel_error);
+state.tau_cmd = joint_torque_nm; 
+
+// --- 6. GEARING & CURRENT CONVERSION ---
+float motor_torque_nm = joint_torque_nm / GEAR_RATIO;
+float current_command = motor_torque_nm / MOTOR_KT;
+  
+// Command Motor Phase Current via SimpleFOC
+motor.move(-current_command);</code></pre>
+
+                <h3>Calibration vs. Production Firmware</h3>
+                <p>Two distinct firmware architectures were developed. The "Production" firmware (shown above) is
+                    stripped down purely for RL execution speed. However, setting up a new joint requires aligning the
+                    FOC electrical zero, finding the absolute zero of the physical limb, and mapping the encoder
+                    offsets. To handle this, a secondary "Calibration" firmware was written. This expands the structs to
+                    16-bytes to allow feed-forward torque commands and raw motor-side angle telemetry, allowing custom
+                    Python calibration scripts to seamlessly tune new hardware before deployment.</p>
+            </section>
+
+            <section class="card">
+                <h1 style="margin-top: 0;">Manufacturing & Calibration Pipeline</h1>
+
+                <h3>3D Printing & Structural Plastics</h3>
+                <p>To keep the actuator lightweight but capable of handling the high impact forces of bipedal
+                    locomotion, the structural housings were 3D printed in PETG. All parts were sliced for a 0.6mm
+                    nozzle to increase layer adhesion and print speed. To optimize for strength, standard outer shells
+                    were printed with 3 wall perimeters, while high-stress internal transmission components (like the
+                    cycloidal cam and output carriers) were reinforced with 4 wall perimeters.</p>
+
+                <h3>CNC Machining the Cycloidal Disks</h3>
+                <p>While plastic is excellent for housings, the core cycloidal disks bear the full brunt of the torque
+                    multiplication. These dual disks were machined out of 1/4" thick aluminum stock using a Genmitsu
+                    3020 desktop CNC router. Milling these in-house allowed for rapid iteration of the cycloidal tooth
+                    profile to find the perfect balance between zero-backlash and smooth rolling contact.</p>
+
+                <div class="image-container">
+                    <img src="images/router_cutting_cycloidal_disk.jpg"
+                        alt="Genmitsu 3020 CNC routing aluminum cycloidal disks">
+                </div>
+
+                <h3>Bottom-Up Assembly</h3>
+                <p>The actuator is designed for a modular, bottom-to-top assembly process. It begins with soldering the
+                    STM32 driver board and encoder daisy-chain, which is then seated into the bottom drive module
+                    alongside the brushless gimbal motor. Once the electrical baseline is secured, the cycloidal
+                    gearbox, bearings, and aluminum disks are stacked and fastened on top, sealing the unit.</p>
+
+                <div class="image-container">
+                    <img src="images/actuator_assembly_1.jpg" alt="Assembly Step 1: Base and Electronics">
+                    <img src="images/actuator_assembly_2.jpg" alt="Assembly Step 2: Motor Seating">
+                    <img src="images/actuator_assembly_3.jpg" alt="Assembly Step 3: Gearbox Lower">
+                    <img src="images/actuator_assembly_4.jpg" alt="Assembly Step 4: Cycloidal Disks">
+                    <img src="images/actuator_assembly_5.jpg" alt="Assembly Step 5: Final Housing">
+                </div>
+
+                <h3>Automated Joint Calibration</h3>
+                <p>Every joint on the robot has tiny physical variations. To manage this, the biped relies on a master
+                    <code>biped_actuator_config.json</code> file, which acts as a centralized database storing the
+                    specific zero-offsets, gear ratios, friction profiles, and hardware IDs for every actuator on the
+                    robot.
+                </p>
+
+                <p><strong>Phase 1: Manual Zeroing</strong><br>
+                    When a new actuator is built, it must be aligned to the robot's physical coordinate frame. Using a
+                    custom Python script (<code>manual_zeroing.py</code>), the STM32 is commanded into a limp state
+                    (Kp=0, Kd=0). The joint is physically locked into its perfectly straight "zero" position on the
+                    workbench, and the script reads the raw absolute angle from the output encoder. This value is
+                    hardcoded into the JSON config as the joint's permanent zero-offset.</p>
+
+                <p><strong>Phase 2: The Full Calibration Sequence</strong><br>
+                    Once zeroed, the actuator runs through a fully automated Python sequence
+                    (<code>full_calibration.py</code>) to map its exact dynamic properties before being cleared for
+                    deployment:</p>
+
+                <ul>
+                    <li><strong>Hardware Recognition:</strong> Scans COM ports, reads the ST-Link serial number, and
+                        cross-references the JSON config to identify the specific joint.</li>
+                    <li><strong>Automated Flashing:</strong> Uses the Arduino CLI to autonomously compile and flash the
+                        specialized 16-byte calibration firmware.</li>
+                    <li><strong>Encoder Synchronization:</strong> Commands a 10-second rotational sweep, tracking both
+                        encoders to verify the gear ratio mapping is flawlessly synchronized.</li>
+                    <li><strong>Smart Friction Mapping:</strong> Gently ramps motor torque to detect physical breakaway
+                        (static friction), then runs dynamic tests to measure terminal velocity.</li>
+                    <li><strong>Data Deployment:</strong> Calculates the exact internal damping and friction
+                        coefficients via linear regression, saves them back to the JSON, and flashes the Production
+                        Firmware back onto the board.</li>
+                </ul>
+
+                <div class="image-container">
+                    <video autoplay loop muted playsinline>
+                        <source src="videos/calibration_screen_recording.mp4" type="video/mp4">
+                    </video>
+
+                    <video autoplay loop muted playsinline>
+                        <source src="videos/calibration_physical_actuator.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </section>
+
+            <!-- PAGINATION -->
+            <div class="doc-pagination">
+                <a href="biped_overview.html">← Previous: Executive Summary</a>
+                <a href="biped_mechanical.html">Next: Mechanical & Kinematics →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Adam Hazenberg</p>
+        <p>
+            <a href="mailto:adamhaze8@gmail.com">Email</a> |
+            <a href="https://www.linkedin.com/in/adamhazenberg" target="_blank">LinkedIn</a> |
+            <a href="https://github.com/adamhaze8" target="_blank">GitHub</a>
+        </p>
+    </footer>
+</body>
+
+</html>

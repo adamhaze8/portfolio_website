@@ -76,7 +76,6 @@ nav a {
     text-align: center;
 }
 
-
 .about-me-content {
     text-align: center;
 }
@@ -93,7 +92,6 @@ nav a {
     line-height: 1.6;
     margin-bottom: 0;
 }
-
 
 .projects-grid {
     display: grid;
@@ -152,7 +150,6 @@ nav a {
     /* Adds a 2px solid border with light gray color */
 }
 
-
 .project-card img,
 .project-card video {
     width: 100%;
@@ -175,7 +172,6 @@ nav a {
     margin-bottom: 10px;
     color: #666;
 }
-
 
 .project-card .date {
     font-size: 0.8rem;
@@ -205,7 +201,6 @@ nav a {
     margin-bottom: 10px;
 }
 
-
 /* List item spacing */
 ul {
     padding-left: 30px;
@@ -213,10 +208,9 @@ ul {
     margin-bottom: 10px;
 }
 
-
 /* Image and video styling in project cards */
 .card img,
-video {
+.card video {
     display: block;
     margin: 0 auto;
     max-width: 1000px;
@@ -237,18 +231,33 @@ footer p {
     font-size: 0.9rem;
 }
 
-/* Image container for multiple images in a row */
+/* =========================================
+   IMAGE & MEDIA CONTAINERS (UPDATED FIX)
+   ========================================= */
+
 .image-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 20px;
-    align-items: center;
+    gap: 30px;
+    align-items: flex-start;
     margin-top: 30px;
     margin-bottom: 30px;
 }
 
-.image-container img {
+/* Tells the figures to evenly split the available horizontal space */
+.image-container figure {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1; /* This is the magic line! It forces them to spread out evenly */
+    min-width: 300px; /* Prevents them from getting squished on phones */
+}
+
+/* Standalone images and videos stay at 500px height */
+.image-container > img,
+.image-container > video {
     height: 500px;
     width: auto;
     max-width: 100%;
@@ -256,12 +265,13 @@ footer p {
     object-fit: cover;
 }
 
-.image-container video {
-    height: 500px;
-    width: auto;
-    max-width: 100%;
+/* Images inside figures stretch to fill the expanded figure width */
+.image-container figure img {
+    width: 100%;
+    height: auto; /* Maintains the aspect ratio so they don't distort */
+    max-height: 500px; /* Keeps them from getting taller than your 500px limit */
     border-radius: 8px;
-    object-fit: cover;
+    object-fit: contain; /* Ensures the whole CAD model stays visible */
 }
 
 .video-container {
@@ -279,7 +289,7 @@ footer p {
     object-fit: cover;
 }
 
-
+/* Standard Figure Styling */
 figure {
     display: flex;
     flex-direction: column;
@@ -303,9 +313,35 @@ figcaption a:hover {
     text-decoration: underline;
 }
 
+/* Forces the media blocks to evenly split the row */
+.media-half {
+    display: flex;
+    flex: 1; /* This makes them share the space 50/50 */
+    min-width: 300px; /* Forces them to stack vertically on phones */
+    justify-content: center;
+}
+
+/* Ensures images, videos, and iframes stretch to fill their half */
+.media-half img,
+.media-half video,
+.media-half iframe {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+/* If you are using YouTube iframes, you need an explicit aspect ratio so they don't squash */
+.media-half iframe {
+    aspect-ratio: 16 / 9;
+}
+
+/* =========================================
+   MOBILE RESPONSIVENESS
+   ========================================= */
+
 /* Responsive styles for medium screens (768px or less) */
 @media (max-width: 768px) {
-
     .profile-img img {
         width: 70px;
         height: auto;
@@ -334,7 +370,6 @@ figcaption a:hover {
 
 /* Additional styles for small screens (480px or less) */
 @media (max-width: 480px) {
-
     header nav a {
         font-size: 0.9rem;
         margin: 0 10px;
@@ -350,4 +385,98 @@ figcaption a:hover {
     .fixed-image {
         display: none;
     }
+}
+
+/* =========================================
+   BIPED DOCUMENTATION LAYOUT
+   ========================================= */
+
+.doc-layout {
+    display: flex;
+    gap: 30px;
+    width: 100%; /* Spans the full screen */
+    align-items: flex-start;
+    padding: 20px;
+}
+
+/* Sidebar Navigation */
+.doc-sidebar {
+    flex: 0 0 250px;
+    position: sticky;
+    top: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 1px solid #eaeaea;
+}
+
+.doc-sidebar h3 {
+    margin-top: 0;
+    font-size: 1.2rem;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.doc-sidebar ul { list-style: none; padding: 0; margin: 0; }
+.doc-sidebar li { margin-bottom: 12px; }
+
+.doc-sidebar a {
+    text-decoration: none;
+    color: #555;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: block;
+    padding: 8px 10px;
+    border-radius: 4px;
+}
+
+.doc-sidebar a:hover { background-color: #f8f9fa; color: #007BFF; }
+
+/* Highlight the current page */
+.doc-sidebar a.active {
+    background-color: #e6f2ff;
+    color: #007BFF;
+    font-weight: bold;
+    border-left: 4px solid #007BFF;
+}
+
+.doc-content { flex: 1; min-width: 0; }
+
+/* Override margin on the first card so it aligns with sidebar top */
+.doc-content .card:first-child { margin-top: 0; }
+
+/* Pagination Buttons */
+.doc-pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.doc-pagination a {
+    padding: 12px 24px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.doc-pagination a:hover {
+    background-color: #007BFF;
+    color: #fff;
+    border-color: #007BFF;
+}
+
+/* Mobile Responsiveness for Docs */
+@media (max-width: 800px) {
+    .doc-layout { flex-direction: column; padding: 10px; }
+    .doc-sidebar { position: static; width: 100%; flex: none; margin-bottom: 20px; box-sizing: border-box; }
 }

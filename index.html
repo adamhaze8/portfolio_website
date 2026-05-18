@@ -18,7 +18,7 @@
             <img src="images/profile_picture.jpg" alt="Adam Hazenberg">
             <div class="profile-info">
                 <h1>Adam Hazenberg</h1>
-                <h2>Robotics Engineering Undergrad Student</h2>
+                <h2>Robotics Engineering Graduate</h2>
             </div>
         </div>
         <nav>
@@ -29,15 +29,40 @@
     <main>
         <section class="card">
             <h1>About Me</h1>
-            <p>I'm Adam, a Robotics Engineering undergrad attending Queen's University with a passion for
+            <p>I'm Adam, a Robotics Engineering graduate from Queen's University with a passion for
                 designing, building, and
                 programming robots. My main areas of expertise (as of right now) include arms, computer vision and
                 mechanical design. I have a particular interest in human-centric robotics and have been building
                 my skillset towards this subfield for the duration of my early career. Welcome to my portfolio!</p>
         </section>
+
+        <!-- NEW HERO SECTION: Custom Biped (Clickable Card) -->
+        <a href="biped_overview.html" class="card hero-card" style="display: block; text-decoration: none; color: inherit; border: 2px solid #007BFF; padding: 20px; border-radius: 12px; background-color: #ffffff;">
+            
+            <!-- Side-by-Side Videos Container -->
+            <div style="display: flex; gap: 15px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap;">
+                <!-- Real World Video -->
+                <video src="videos/biped_walking_real.mp4" alt="Real World Walking Tests" autoplay muted loop playsinline style="flex: 1; min-width: 280px; width: 100%; max-height: 450px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;">
+                    Your browser does not support the video tag.
+                </video>
+                <!-- Simulation Video -->
+                <video src="videos/isaac_lab_training.mp4" alt="Isaac Lab Simulation" autoplay muted loop playsinline style="flex: 1; min-width: 280px; width: 100%; max-height: 450px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+
+            <!-- Text Section -->
+            <div class="card-content" style="padding: 10px;">
+                <h1 style="margin-top: 0; color: #333;">1.1m, 55lb Custom 10-DOF Humanoid Biped</h1>
+                <h3 style="color: #555;">Zero-Shot Sim-to-Real RL • Distributed Impedance Control • Scratch-Built Hardware</h3>
+                <p style="color: #333;">A 25kg bipedal humanoid engineered entirely from scratch. Features a 6061 Aluminum chassis, mathematically decoupled dual-stage belt kinematics, and robust proximal policy optimization (PPO) trained via NVIDIA Isaac Lab. Capable of dynamic balancing and rough terrain traversal.</p>
+            </div>
+        </a>
+        <!-- END HERO SECTION -->
+
         <section class="card">
             <!-- Projects Section -->
-            <h1>Projects</h1>
+            <h1>Other Projects</h1>
             <div class="projects-grid">
                 <a href="magnus.html" class="project-card">
                     <video src="videos/magnus_quick.mp4" alt="Magnus" autoplay muted loop playsinline>
@@ -173,13 +198,10 @@
             </div>
         </section>
 
-
-
-
     </main>
 
     <footer>
-        <p>&copy; 2024 Adam Hazenberg</p>
+        <p>&copy; 2026 Adam Hazenberg</p>
         <p>
             <a href="mailto:adamhaze8@gmail.com">Email</a> |
             <a href="https://www.linkedin.com/in/adamhazenberg" target="_blank">LinkedIn</a> |

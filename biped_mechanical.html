@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Mechanical Design of 1.1m, 55lb Biped">
+    <title>Mechanical - 1.1m Biped</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .doc-layout {
+            display: flex;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: flex-start;
+            padding: 20px;
+        }
+
+        /* Sidebar Navigation */
+        .doc-sidebar {
+            flex: 0 0 250px;
+            position: sticky;
+            top: 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border: 1px solid #eaeaea;
+        }
+
+        .doc-sidebar h3 {
+            margin-top: 0;
+            font-size: 1.2rem;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .doc-sidebar ul { list-style: none; padding: 0; margin: 0; }
+        .doc-sidebar li { margin-bottom: 12px; }
+        
+        .doc-sidebar a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: block;
+            padding: 8px 10px;
+            border-radius: 4px;
+        }
+
+        .doc-sidebar a:hover { background-color: #f8f9fa; color: #007BFF; }
+        
+        /* Highlight the current page */
+        .doc-sidebar a.active {
+            background-color: #e6f2ff;
+            color: #007BFF;
+            font-weight: bold;
+            border-left: 4px solid #007BFF;
+        }
+
+        .doc-content { flex: 1; min-width: 0; }
+
+        /* Override margin on the first card so it aligns with sidebar top */
+        .doc-content .card:first-child { margin-top: 0; }
+
+        /* Pagination Buttons */
+        .doc-pagination {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .doc-pagination a {
+            padding: 12px 24px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .doc-pagination a:hover {
+            background-color: #007BFF;
+            color: #fff;
+            border-color: #007BFF;
+        }
+
+        @media (max-width: 800px) {
+            .doc-layout { flex-direction: column; padding: 10px; }
+            .doc-sidebar { position: static; width: 100%; flex: none; margin-bottom: 20px; box-sizing: border-box; }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="profile-img">
+            <img src="images/profile_picture.jpg" alt="Adam Hazenberg">
+            <div class="profile-info">
+                <h1>Adam Hazenberg</h1>
+                <h2>Robotics Engineering Graduate</h2>
+            </div>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="https://github.com/adamhaze8" target="_blank">GitHub</a>
+        </nav>
+    </header>
+
+    <main class="doc-layout">
+        
+        <!-- SIDEBAR NAVIGATION (Updated to 6 pages) -->
+        <aside class="doc-sidebar">
+            <h3>Architecture Report</h3>
+            <ul>
+                <li><a href="biped_overview.html">1. Executive Summary</a></li>
+                <li><a href="biped_actuators.html">2. Custom Actuators</a></li>
+                <li><a href="biped_mechanical.html" class="active">3. Mechanical & Kinematics</a></li>
+                <li><a href="biped_firmware.html">4. Firmware & Safety</a></li>
+                <li><a href="biped_simulation.html">5. Simulation & RL</a></li>
+                <li><a href="biped_deployment.html">6. Real-World Deployment</a></li>
+            </ul>
+        </aside>
+
+        <!-- MAIN DOCUMENT CONTENT -->
+        <div class="doc-content">
+            
+            <section class="card">
+                <h1 style="margin-top: 0;">Mechanical Architecture & Manufacturing</h1>
+                <p>To survive the violent impulse forces generated during dynamic fall recovery by an RL policy, the chassis heavily prioritizes structural rigidity over weight savings.</p>
+                
+                <h3>Hardware Constraints</h3>
+                <ul>
+                    <li><strong>Frame Material:</strong> 6061 Aluminum for primary load paths. PETG and Carbon-Nylon used for non-load-bearing covers.</li>
+                    <li><strong>Manufacturing Pipeline:</strong> In-house CNC milling via Genmitsu 3020 PRO MAX. Z-axis offset is maintained at -0.5mm in Fusion 360 CAM to ensure clean through-cuts on the spoilboard.</li>
+                </ul>
+
+                <h3>Sim-to-Real Contact Mechanics (The Feet)</h3>
+                <p>Soft materials introduce unmodeled compliance that fundamentally violates Isaac Lab's rigid-body contact assumptions, leading to immediate policy failure on physical hardware. Therefore, the foot design utilizes 100% rigid construction, with tread material restricted to PEVA Rubberized Safety Tape or ultra-thin 3D Printed TPU.</p>
+            </section>
+
+            <section class="card">
+                <h1>Kinematics, Actuation, & Power Transmission</h1>
+                <p>The robot utilizes a 10-DOF lower-body architecture (5-DOF per leg). Distal inertia (mass at the ends of the limbs) is actively minimized to enable rapid swing-leg retraction.</p>
+
+                <h3>Actuator Selection & Load Math</h3>
+                <p>The system utilizes a 2-Tier cycloidal direct-drive approach to maximize torque density:</p>
+                <ul>
+                    <li><strong>Primary Actuators (Hip Pitch, Knee, Ankle Pitch):</strong> Powered by CubeMars G80 KV60 motors with a 16:1 Cycloidal transmission. Because peak dynamic loads exceed 40 Nm, all load-bearing G80 joints are pinned using 4mm Grade 12.9 Alloy Steel pins to prevent shear.</li>
+                    <li><strong>Secondary Actuators (Hip Roll, Hip Yaw):</strong> Powered by CubeMars G60 KV55 motors with a 20:1 Cycloidal transmission.</li>
+                </ul>
+
+                <h3>Mass-Centralized Ankle Kinematics</h3>
+                <p>To eliminate the pendulum effect of a heavy G80 motor mounted directly at the foot, the Ankle Pitch actuator is relocated to the mid-thigh. Power is routed via a dual-stage 8mm pitch timing belt across a concentric knee idler down to the ankle.</p>
+                <p><strong>The Software Decoupling Pipeline:</strong> Instead of relying on unstable URDF mimic tags, the belt coupling is mathematically abstracted to maintain a pure "Logical Space" for the Neural Network:</p>
+                <ul>
+                    <li><strong>Inverse Kinematics:</strong> The knee's angle/velocity is subtracted from the ankle's raw sensor readings before the NN observes the state.</li>
+                    <li><strong>Forward Kinematics:</strong> When the NN commands an action, the knee's target position is subtracted from the ankle's target. This forces the physical thigh motor to actively spool out the exact amount of slack required to cancel the belt's pull when the knee bends.</li>
+                </ul>
+
+                <div class="image-container" style="display: flex; gap: 15px; margin-top: 20px;">
+                    <img src="images/biped_leg_cad.png" alt="CAD Render of the Dual-Stage Belt Leg" style="flex: 1; width: 100%; border-radius: 8px;">
+                    <img src="images/biped_cnc_parts.jpg" alt="CNC Machined Aluminum Components" style="flex: 1; width: 100%; border-radius: 8px;">
+                </div>
+            </section>
+
+            <!-- PAGINATION -->
+            <div class="doc-pagination">
+                <a href="biped_overview.html">← Previous: Executive Summary</a>
+                <a href="biped_firmware.html">Next: Firmware & Safety →</a>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Adam Hazenberg</p>
+        <p>
+            <a href="mailto:adamhaze8@gmail.com">Email</a> |
+            <a href="https://www.linkedin.com/in/adamhazenberg" target="_blank">LinkedIn</a> |
+            <a href="https://github.com/adamhaze8" target="_blank">GitHub</a>
+        </p>
+    </footer>
+</body>
+</html>
