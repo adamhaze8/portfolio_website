@@ -98,7 +98,60 @@
                     within the URDF, preventing Isaac Lab from doubling the mechanical resistance.</p>
             </section>
 
+            <section class="card">
+                <h1 style="margin-top: 0;">2. Reinforcement Learning & Training Environment</h1>
 
+                <p>The locomotion policy was trained using Proximal Policy Optimization (PPO) via the <code>rsl_rl</code> library within Isaac Lab. Rather than relying on massive, overly-complex neural networks, the architecture prioritizes a highly accurate physics environment and a lean <code>[128, 128, 128]</code> ELU Actor-Critic network. The simulation runs 4096 parallel environments at a 200Hz physics step, decimated by a factor of 4 to match the robot's physical 50Hz policy execution rate.</p>
+
+                <h3>Domain Randomization & The "Chaos" Architecture</h3>
+                <p>To ensure zero-shot transfer, the neural network was explicitly forbidden from trusting instantaneous, perfect simulation data. An aggressive Domain Randomization curriculum was implemented to simulate real-world hardware degradation:</p>
+                <ul>
+                    <li><strong>Observation Noise & History:</strong> Uniform noise is injected directly into all simulated IMU and encoder readings. Because instantaneous data is corrupt, the policy relies on a flattened 15-frame history buffer to implicitly deduce true state trends over a 300ms window.</li>
+                    <li><strong>Dynamic USB Latency Simulation:</strong> A custom <code>DelayBuffer</code> randomizes the latency of the policy's actions between 1 and 3 control steps (20ms to 60ms) dynamically. This forces the network to learn proactive, predictive stepping rather than reactive thrashing.</li>
+                    <li><strong>Mechanical Variation:</strong> At startup, the Isaac Lab environment randomly scales the robot's mass (0.8x to 1.2x), shifts the Centers of Mass by up to 2cm, and scales joint friction (0.5x to 1.5x) and actuator stiffness.</li>
+                </ul>
+
+                <h3>The Action Wrapper: Smoothing & Belt Decoupling</h3>
+                <p>The custom <code>BipedActuatorAction</code> wrapper acts as the final middleware between the Neural Network and the Isaac Lab physics engine. It performs three crucial tasks:</p>
+                <ul>
+                    <li>1. Applies the randomized 20-60ms latency.</li>
+                    <li>2. Applies an Exponential Moving Average (EMA) filter (<code>alpha = 0.3</code>) to the actions, damping high-frequency twitches that would otherwise destroy the physical gearboxes.</li>
+                    <li>3. Executes the Forward Kinematics decoupling for the dual-stage ankle belt (<code>ankle_cmd -= knee_cmd</code>), ensuring the physics engine correctly models the physical slack spooled out by the thigh actuator.</li>
+                </ul>
+
+<pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 14px; margin: 20px 0;"><code>// Inside BipedActuatorAction : JointPositionAction
+def process_actions(self, actions: torch.Tensor):
+    # 1. Dynamic Jitter: Re-roll random latency (20ms - 60ms)
+    dynamic_lags = torch.randint(
+        self.cfg.min_delay_steps, self.cfg.max_delay_steps + 1, 
+        (self._env.num_envs,), device=self.device
+    )
+    self.action_delay_buffer.set_time_lag(dynamic_lags)
+    delayed_actions = self.action_delay_buffer.compute(actions)
+
+    # 2. EMA Action Smoothing (Alpha = 0.3)
+    self.smoothed_actions = (self.cfg.alpha * delayed_actions) + ((1.0 - self.cfg.alpha) * self.smoothed_actions)
+    super().process_actions(self.smoothed_actions)
+    
+    # 3. Forward Kinematics: Decouple the Ankle Belt for the Physics Engine
+    self.processed_actions[:, self.l_ankle_idx] -= self.processed_actions[:, self.l_knee_idx]
+    self.processed_actions[:, self.r_ankle_idx] -= self.processed_actions[:, self.r_knee_idx]
+</code></pre>
+
+ <div class="image-container">
+                    <img src="images/training_flowchart.png" style="height: auto; width: 100%; max-width: 2000px;"
+                        alt="RL training flowchart">
+                </div>
+
+                <h3>Reward Formulation & Hardware Envelope Protection</h3>
+                <p>The baseline reward structure was heavily inspired by classic Cassie flat-ground environments (e.g., heavily weighting <code>feet_air_time</code>). However, significant custom reward shaping was engineered to protect the physical hardware limits:</p>
+                <ul>
+                    <li><strong>Gait Symmetry:</strong> A custom <code>feet_air_time_symmetry</code> penalty (weight: -8.0) tracks the delta between the left and right foot air times, aggressively penalizing limping behaviors.</li>
+                    <li><strong>Motor Envelope Violation (Dynamic Stall Limits):</strong> Rather than using a generic power penalty, a custom <code>penalty_motor_envelope_violation</code> calculates the dynamic velocity limit of the motors based on their current torque output. By mapping the exact polynomial curves of the G60 and G80 motors, the network is harshly penalized (weight: -1.0e-3) if it commands a velocity that exceeds the physical stall-torque boundary of the real actuators.</li>
+                    <li><strong>Foot Clearance Tracking:</strong> A custom <code>track_foot_clearance</code> reward (weight: 5.0) calculates the 3D position of the foot's corners to ensure a minimum 0.08m ground clearance during the swing phase, preventing toe-stubbing on physical hardware.</li>
+                </ul>
+
+            </section>
 
             <div class="doc-pagination">
                 <a href="biped_electrical_and_communication.html">← Previous: Electrical & Communication</a>
