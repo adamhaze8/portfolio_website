@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Simulation and Reinforcement Learning Pipeline">
+    <title>Simulation & RL - 1.1m Biped</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="profile-img">
+            <img src="images/profile_picture.jpg" alt="Adam Hazenberg">
+            <div class="profile-info">
+                <h1>Adam Hazenberg</h1>
+                <h2>Robotics Engineering Graduate</h2>
+            </div>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+        </nav>
+    </header>
+
+    <main class="doc-layout">
+        <aside class="doc-sidebar">
+            <h3>Architecture Report</h3>
+            <ul>
+                <li><a href="biped_overview.html">1. Executive Summary</a></li>
+                <li><a href="biped_actuators.html">2. Custom Actuators</a></li>
+                <li><a href="biped_mechanical.html">3. Mechanical & Kinematics</a></li>
+                <li><a href="biped_electrical_and_communication.html">4. Electronics & Comms</a></li>
+                <li><a href="biped_simulation_rl.html" class="active">5. Simulation & RL</a></li>
+                <li><a href="biped_deployment.html">6. Real-World Deployment</a></li>
+            </ul>
+        </aside>
+
+        <div class="doc-content">
+
+            <section class="card">
+                <h1 style="margin-top: 0;">1. Automated CAD-to-SIM Pipeline</h1>
+                <h3>True Inertial Extraction</h3>
+                <p>Standard URDF exporters often approximate mass and inertia using simple bounding boxes. Because
+                    distal inertia is so critical to bipedal locomotion, exact values were required. A hybrid approach
+                    was utilized to guarantee absolute physical accuracy: the mass of every individual link was manually
+                    weighed on a precision scale down to the gram. Meanwhile, the complex Center of Mass (CoM)
+                    coordinates and Inertia Tensors were extracted directly from the CAD model using a custom
+                    Fusion 360 Python API script. A subsequent script (<code>inject_accurate_inertial_values.py</code>)
+                    merges these physical weights with the CAD coordinates, handling all necessary coordinate
+                    transformations, and injects them seamlessly into the URDF's <code>&lt;inertial&gt;</code> tags.</p>
+
+                <div class="image-container">
+                    <figure>
+                        <img src="images/fusion_intertial_extraction.png"
+                            style="width: 100%; max-width: 1200px; max-height: none;"
+                            alt="Fusion 360 script extracting accurate inertial values from the CAD model">
+                        <figcaption>Fusion 360 script extracting accurate inertial values from the CAD model
+                        </figcaption>
+                    </figure>
+                    <figure>
+                        <img src="images/extracted_intertial_values.png"
+                            style="width: 100%; max-width: 700px; max-height: none;"
+                            alt="Extracted Inertial Values YAML">
+                        <figcaption>Extracted Inertial Values YAML</figcaption>
+                    </figure>
+                </div>
+
+                <h3>Friction Mapping</h3>
+                <p>To accurately simulate motor effort, the Isaac Lab physics engine needs the exact static breakaway
+                    friction and kinetic damping of the custom cycloidal gearboxes. Rather than guessing these values,
+                    the robot utilizes a specialized calibration firmware that physically tests and extracts these
+                    parameters from the real actuators. These hardware measurements are stored in a centralized
+                    configuration file (<code>biped_actuator_config.json</code>). The <code>inject_friction.py</code>
+                    script then automatically populates the URDF <code>&lt;dynamics&gt;</code> tags with these
+                    real-world coefficients, ensuring the simulation's torque requirements perfectly match the physical
+                    robot.</p>
+
+                <div class="image-container">
+                    <figure>
+                        <img src="images/actuator_config.png" style="width: 100%; max-width: 1000px; max-height: none;"
+                            alt="Actuator Configuration JSON with hardware-extracted friction values">
+                        <figcaption>Actuator Configuration JSON with Hardware-Extracted Friction Values
+                        </figcaption>
+                    </figure>
+                    <figure>
+                        <img src="images/biped_urdf_joints.png" alt="URDF Joints with Injected Friction Values">
+                        <figcaption>URDF Joints with Injected Friction Values
+                        </figcaption>
+                    </figure>
+                </div>
+
+                <h3>Modeling the Dual-Stage Belt Transmission</h3>
+                <p>The centralization of the ankle mass via a dual-stage belt introduces complex coupled dynamics: the
+                    physical ankle actuator must counteract friction from the entire belt routing, while the knee
+                    actuator does not. The friction injection script programmatically splits the measured drag of the
+                    belt system, allocating 60% of the belt's friction to the knee joint and 40% to the ankle joint
+                    within the URDF, preventing Isaac Lab from doubling the mechanical resistance.</p>
+            </section>
+
+
+
+            <div class="doc-pagination">
+                <a href="biped_electrical_and_communication.html">← Previous: Electrical & Communication</a>
+                <a href="biped_hardware_deployment.html">Next: Hardware Deployment →</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Adam Hazenberg</p>
+        <p>
+            <a href="mailto:adamhaze8@gmail.com">Email</a> |
+            <a href="https://www.linkedin.com/in/adamhazenberg" target="_blank">LinkedIn</a> |
+            <a href="https://github.com/adamhaze8" target="_blank">GitHub</a>
+        </p>
+    </footer>
+</body>
+
+</html>

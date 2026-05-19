@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="System-Level Electronics and Communication Topology">
+    <title>Electronics & Comms - 1.1m Biped</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="profile-img">
+            <img src="images/profile_picture.jpg" alt="Adam Hazenberg">
+            <div class="profile-info">
+                <h1>Adam Hazenberg</h1>
+                <h2>Robotics Engineering Graduate</h2>
+            </div>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+        </nav>
+    </header>
+
+    <main class="doc-layout">
+
+        <aside class="doc-sidebar">
+            <h3>Architecture Report</h3>
+            <ul>
+                <li><a href="biped_overview.html">1. Executive Summary</a></li>
+                <li><a href="biped_actuators.html">2. Custom Actuators</a></li>
+                <li><a href="biped_mechanical.html">3. Mechanical & Kinematics</a></li>
+                <li><a href="biped_electrical_and_communication.html" class="active">4. Electrical & Communication</a>
+                </li>
+                <li><a href="biped_simulation_rl.html">5. Simulation & RL</a></li>
+                <li><a href="biped_deployment.html">6. Real-World Deployment</a></li>
+            </ul>
+        </aside>
+
+        <div class="doc-content">
+
+            <section class="card">
+                <h1 style="margin-top: 0;">1. Power Delivery Architecture</h1>
+
+                <p>Driving 10 independent high-torque brushless actuators creates immense power demands. The entire
+                    powertrain operates on a <strong>24V main power bus</strong>, which regularly draws massive amperage
+                    spikes during simultaneous high-torque commands, followed immediately by severe voltage surges
+                    during dynamic fall recovery and regenerative braking. The power architecture is designed strictly
+                    around managing these extremes.</p>
+
+                <h3>Core Power Train & Inrush Protection</h3>
+                <ul>
+                    <li><strong>Main Battery:</strong> CNHL 6S LiPo 5000mAh 65C (22.2V Nominal / 25.2V Max). This
+                        high-discharge pack energizes the 24V main bus, providing the necessary immediate current for
+                        rapid impedance commands.</li>
+                    <li><strong>Anti-Spark Switch:</strong> Flipsky Smart Enhanced Version ESC Switch. Plugging a 6S
+                        battery directly into a highly capacitive system creates destructive arc flashes. This switch
+                        safely handles the inrush current and supports up to 120A of continuous draw, ensuring the 24V
+                        power lines are never the bottleneck.</li>
+                    <li><strong>Firmware Current Limiting:</strong> To protect the hardware and motor windings during
+                        extended RL testing, strict phase current limits are enforced directly within the STM32
+                        SimpleFOC firmware. The large G80 actuators (Hip Pitch, Knee, Ankle Pitch) are hard-capped at
+                        12.2 Amps, while the smaller G60 actuators (Hip Yaw, Hip Roll) are restricted to 6.7 Amps.</li>
+                </ul>
+
+                <h3>Regenerative Braking & Local Filtering</h3>
+                <ul>
+                    <li><strong>Dump Load (Regen Clamp):</strong> When a 25kg robot yields to gravity, back-driving the
+                        10 actuators turns them into generators. An ODrive Regen Clamp is installed in parallel with the
+                        battery, equipped with a 0.5-Ohm 200W chassis-mounted aluminum wirewound resistor to safely
+                        dissipate extreme back-EMF as heat.</li>
+                    <li><strong>Actuator Capacitance:</strong> To suppress high-frequency electrical noise and handle
+                        localized voltage ripple directly at the motor drivers, external 50V 470uF High-Frequency
+                        Low-ESR Aluminum Electrolytic Capacitors are clipped to the outside of every single actuator.
+                    </li>
+                </ul>
+
+                <h3>Logic Power (Raspberry Pi & Comms)</h3>
+                <ul>
+                    <li><strong>Step-Down Converter:</strong> While the motors run exclusively on the 24V bus, the
+                        Raspberry Pi and USB hubs require a stable 5V supply. A DROK 12A Adjustable DC Buck Converter
+                        steps down the voltage. Crucially, this splits off the main power line before the regen clamp,
+                        ensuring the 5V logic branch is never starved during a massive braking voltage dump.</li>
+                </ul>
+
+                <div class="image-container">
+                    <figure>
+                        <img src="images/biped_power_wiring_diagram.jpg"
+                            style="width: 100%; max-width: 2000px; max-height: none;"
+                            alt="Power Delivery Wiring Diagram">
+                        <figcaption>Figure 1: High-Voltage and Logic Power Routing Topology</figcaption>
+                    </figure>
+                </div>
+            </section>
+
+            <section class="card">
+                <h1 style="margin-top: 0;">2. Communication & Control Topology</h1>
+
+                <p>Because the low-level impedance calculations are natively handled by the STM32 microcontrollers on
+                    each joint, the master control PC is strictly responsible for high-level neural network inference
+                    and state estimation over a distributed USB network.</p>
+
+                <h3>Master Control & The USB vs. CAN Bus Trade-Off</h3>
+                <p>While CAN bus is the undeniable industry standard for distributed industrial robotics, utilizing it
+                    on the ST B-G431B-ESC1 driver boards requires carefully soldering external CAN transceivers to
+                    microscopic pads, as well as integrating USB-to-CAN adapters at the master PC. To accelerate the
+                    hardware iteration cycle, a conscious design choice was made to utilize the drivers' native Micro
+                    USB ports instead.</p>
+                <ul>
+                    <li><strong>Single Board Computer (SBC):</strong> Raspberry Pi 4 (Ubuntu 22.04/24.04). Serves as the
+                        central brain,
+                        executing the ONNX neural network policy and orchestrating the asynchronous serial communication
+                        loop.</li>
+                    <li><strong>Industrial USB Distribution:</strong> To communicate with 10 independent nodes without
+                        overwhelming a single bus controller, the USB topology is split. Two Waveshare Industrial Grade
+                        Powered USB 3.2 Hubs handle the bulk of the routing, with 4 actuators connected to each hub. The
+                        remaining 2 actuators are routed directly into the Raspberry Pi's native USB ports.</li>
+                    <li><strong>Bandwidth & Convenience:</strong> Through rigorous testing, it was verified that this
+                        distributed USB topology provides more than enough bandwidth to reliably sustain the strict 50Hz
+                        asynchronous control frequency required by the Neural Network. Furthermore, relying purely on
+                        USB elegantly allows any individual actuator to be unplugged from the robot and connected
+                        directly to a standard laptop for rapid Python-based calibration and debugging without requiring
+                        specialized CAN hardware adapters.</li>
+                </ul>
+
+                <h3>State Estimation & The BNO085 Protocol Journey</h3>
+                <p>Extracting high-fidelity orientation data from the BNO085 IMU on a Raspberry Pi running user-space
+                    Ubuntu required navigating several strict hardware-OS limitations before arriving at a stable
+                    architecture:</p>
+                <ul>
+                    <li><strong>I2C (Abandoned):</strong> The Pi's hardware has a notorious bug handling I2C
+                        clock-stretching. Because the BNO085 relies heavily on clock-stretching to format its data
+                        packets, the bus repeatedly locked up, resulting in unacceptably slow and stale telemetry.</li>
+                    <li><strong>SPI (Abandoned):</strong> The IMU's standard SHTP protocol over SPI relies on strict
+                        hardware interrupt (INT) timing. Because Ubuntu is not a Real-Time OS, the kernel's user-space
+                        latency caused the Pi to constantly miss the interrupt windows, resulting in dropped frames.
+                    </li>
+                    <li><strong>Standard UART (Abandoned):</strong> Attempting standard UART resulted in the same SHTP
+                        protocol overhead, where slight OS-level handshake delays triggered continuous `Watchdog
+                        timeout!` resets on the sensor.</li>
+                    <li><strong>The Solution — UART-RVC Mode:</strong> The IMU is hardwired into UART-RVC (Robot Vacuum
+                        Cleaner) mode. This entirely disables the complex SHTP handshake protocol. Instead, the BNO085
+                        acts as a pure stream, continuously transmitting a highly optimized, raw 19-byte packet of
+                        calibrated Yaw, Pitch, Roll, and Acceleration data at a strict 100Hz (115200 baud). This
+                        elegantly bypasses all Linux kernel timing limitations, providing a bulletproof state estimation
+                        stream for the Neural Network.</li>
+                </ul>
+
+                <div class="image-container">
+                    <figure>
+                        <img src="images/biped_communication_wiring_diagram.jpg"
+                            style="width: 100%; max-width: 2000px; max-height: none;"
+                            alt="Communication Topology Wiring Diagram">
+                        <figcaption>Figure 2: USB Distribution and UART-RVC Sensor Topology</figcaption>
+                    </figure>
+                </div>
+            </section>
+
+            <div class="doc-pagination">
+                <a href="biped_mechanical.html">← Previous: Mechanical & Kinematics</a>
+                <a href="biped_simulation_rl.html">Next: Simulation & RL →</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Adam Hazenberg</p>
+        <p>
+            <a href="mailto:adamhaze8@gmail.com">Email</a> |
+            <a href="https://www.linkedin.com/in/adamhazenberg" target="_blank">LinkedIn</a> |
+            <a href="https://github.com/adamhaze8" target="_blank">GitHub</a>
+        </p>
+    </footer>
+</body>
+
+</html>
