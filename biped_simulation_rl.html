@@ -164,9 +164,9 @@
                         alt="RL training flowchart">
                 </div>
 
-                <h3>Reward Formulation & Hardware Envelope Protection</h3>
-                <p>The baseline reward structure was heavily inspired by classic Cassie flat-ground environments (e.g.,
-                    heavily weighting <code>feet_air_time</code>). However, significant custom reward shaping was
+                <h3>Reward Shaping</h3>
+                <p>The baseline reward structure was heavily inspired by classic Cassie flat-ground environments.
+                    However, significant custom reward shaping was
                     engineered to protect the physical hardware limits:</p>
                 <ul>
                     <li><strong>Gait Symmetry:</strong> A custom <code>feet_air_time_symmetry</code> penalty (weight:

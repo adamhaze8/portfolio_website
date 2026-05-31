@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Real-World Deployment of the 1.1m Biped">
+    <title>Real-World Deployment - 1.1m Biped</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+</head>
+
+<body>
+    <header>
+        <div class="profile-img">
+            <img src="images/profile_picture.jpg" alt="Adam Hazenberg">
+            <div class="profile-info">
+                <h1>Adam Hazenberg</h1>
+                <h2>Robotics Engineering Graduate</h2>
+            </div>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+        </nav>
+    </header>
+
+    <main class="doc-layout">
+
+        <aside class="doc-sidebar">
+            <h3>Architecture Report</h3>
+            <ul>
+                <li><a href="biped_overview.html">1. Executive Summary</a></li>
+                <li><a href="biped_actuators.html">2. Custom Actuators</a></li>
+                <li><a href="biped_mechanical.html">3. Mechanical & Kinematics</a></li>
+                <li><a href="biped_electrical_and_communication.html">4. Electronics & Communication</a></li>
+                <li><a href="biped_simulation_rl.html">5. Simulation & RL</a></li>
+                <li><a href="biped_deployment.html" class="active">6. Real-World Deployment</a></li>
+            </ul>
+        </aside>
+
+        <div class="doc-content">
+
+            <section class="card">
+                <h1 style="margin-top: 0;">1. Sim-to-Real Development Timeline</h1>
+                <p>Transferring a policy from a pristine simulation environment to a custom-built, 25kg physical
+                    platform is an iterative process of identifying and bridging reality gaps. What follows is the
+                    chronological debugging sequence required to achieve stable stationary walking.</p>
+
+                <h3>Initial Inference & History Shock</h3>
+                <p>The very first attempt to run inference on the physical robot resulted in immediate, violent
+                    flailing. This was traced back to an issue with the observation history buffer during the warmup
+                    phase. The policy was being fed a continuous stream of intended actions while the robot was
+                    physically locked in a limp crouch. By the time inference actually began, the neural network
+                    believed it had been commanding movement for five seconds without any physical response—creating a
+                    massive, sudden overcompensation akin to integral windup. Implementing an explicit
+                    `update_history_only` warmup method, which populated the position sensors but kept the action buffer
+                    at true zero, stabilized the initial startup.</p>
+
+                <h3>Addressing Twitchy Behaviors & High-Frequency Noise</h3>
+                <p>Once the robot could start safely, its walking gait was incredibly rapid, frantic, and twitchy
+                    compared to the smooth motion seen in Isaac Lab. To damp this behavior, a low-pass Exponential
+                    Moving Average (EMA) filter was simultaneously added to both the training environment and the
+                    physical `BipedBrain` inference loop. Additionally, the penalty for action rates in the RL reward
+                    structure was significantly increased, forcing the network to prioritize smoother, slower
+                    transitions between commands.</p>
+
+                <h3>Sensor Noise & The Forward Bias</h3>
+                <p>While the smoothing helped reduce the frantic stepping, the biped still acted erratically and
+                    exhibited a strong, unintended forward bias—marching forward aggressively when it was commanded to
+                    march in place. Assuming the network was over-trusting perfect simulator telemetry, aggressive
+                    uniform noise was injected into the training observations. This successfully calmed the erratic
+                    behavior, but the forward drift persisted. Realizing the physical Center of Mass (CoM) of the torso
+                    likely didn't perfectly match the CAD URDF, extensive Domain Randomization was added to the training
+                    pipeline, randomly shifting mass distribution and center-of-mass coordinates. This successfully
+                    trained the policy to dynamically correct its balance, eliminating the forward bias.</p>
+
+                <h3>Command Latency & Final Stabilization</h3>
+                <p>Despite walking in place without drifting, the steps were still too fast and the robot struggled to
+                    hold its own weight confidently during the swing phase. This pointed to a classic latency gap: the
+                    neural network was issuing commands and expecting instant physical torque, leading to thrashing when
+                    the physical hardware inevitably lagged behind. To bridge this, a dynamic delay was implemented in
+                    the training environment. Observations were slightly delayed, and significant randomized latency (up
+                    to 3 control steps, or 60ms) was applied to the action outputs. Training the policy to predictively
+                    handle this lag resulted in the final, stable marching gait.</p>
+            </section>
+
+            <section class="card">
+                <h1 style="margin-top: 0;">2. Deployment Software Stack</h1>
+                <p>To execute the trained policy safely on heavy hardware, a robust, multi-threaded Python architecture
+                    was developed. The stack relies on asynchronous I/O and strict memory isolation to sustain a
+                    continuous 50Hz control loop without blocking sensor reads or dropping neural network frames.</p>
+
+                <h3>biped_core.py (Middleware & Inference)</h3>
+                <p>This is the foundational middleware of the system. It contains the <code>BipedBrain</code> class,
+                    which leverages the <code>onnxruntime</code> library (optimized specifically for sequential
+                    single-core CPU execution to minimize context-switching overhead) to handle neural network
+                    inference, history buffer management, and EMA action smoothing. Furthermore, this script houses the
+                    core classes for hardware interaction:</p>
+                <ul>
+                    <li><strong>IMUNode (Multiprocessing):</strong> Reading I2C/UART sensors in Python inherently
+                        suffers from Global Interpreter Lock (GIL) stutter. The IMU node elegantly bypasses this by
+                        spawning an isolated, high-priority background process. This engine continuously polls the
+                        BNO085 and streams the orientation and gravity vectors into shared C-type memory arrays,
+                        allowing the main control loop to read zero-latency state data instantly.</li>
+                    <li><strong>ActuatorNode (Safety Firewalls):</strong> This class manages the asynchronous USB
+                        transactions to the STM32 drivers. Crucially, it acts as a dynamic software firewall. It
+                        enforces strict "Virtual Wall" positional limits, automatically clipping commands if the network
+                        attempts to break a physical joint boundary. It also runs a continuous mathematical thermal
+                        estimator, calculating resistive phase loss (I²R) based on real-time torque, ensuring the custom
+                        actuators do not melt their PETG housings during extended operation.</li>
+                </ul>
+
+                <h3>march_in_place.py (Execution State Machine)</h3>
+                <p>This is the primary asynchronous execution script. It utilizes <code>asyncio.gather</code> to
+                    concurrently dispatch serial commands to all ten nodes and follows a strict, safe progression to
+                    bring the robot online. It begins in a limp mode, executes pre-flight checks (verifying IMU upright
+                    orientation and zero initial velocity), gracefully interpolates the gains to ramp the robot into a
+                    crouch, and then runs a 5-second warmup loop to populate the neural network's history buffer without
+                    commanding motion. Once operating in the main pipelined inference loop, it constantly evaluates the
+                    robot's state against strict safety thresholds—such as triggering an immediate limp-mode abort if a
+                    tip-over (Gravity Z > -0.2) or neural panic state (Mean Action > 4.3) is detected. All
+                    high-frequency telemetry is simultaneously buffered and dumped to a CSV upon completion for
+                    post-flight analysis.</p>
+
+                <h3>Calibration & Diagnostic Utilities</h3>
+                <p>A suite of secondary scripts was developed to support hardware deployment.
+                    <code>calibrate_biped.py</code> automates the extraction of absolute physical zero-offsets and IMU
+                    baseline deviations while the robot is suspended, saving them to a master JSON file. Furthermore,
+                    specialized stress-testing tools like <code>print_joint_angles.py</code> and
+                    <code>imu_test.py</code> are utilized to verify USB bandwidth headroom and Inter-Process
+                    Communication (IPC) stability, ensuring the Pi can consistently meet the 20ms cycle budget before
+                    the full neural network is engaged.</p>
+
+            </section>
+
+            <div class="doc-pagination right-only">
+                <a href="biped_simulation_rl.html">← Previous: Simulation & RL</a>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Adam Hazenberg</p>
+        <p>
+            <a href="mailto:adamhaze8@gmail.com">Email</a> |
+            <a href="https://www.linkedin.com/in/adamhazenberg" target="_blank">LinkedIn</a> |
+            <a href="https://github.com/adamhaze8" target="_blank">GitHub</a>
+        </p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+</body>
+
+</html>
