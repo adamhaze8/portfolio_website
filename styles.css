@@ -1,11 +1,17 @@
-/* Reset and body styling: remove default margin and padding, set font, background color, and padding */
-* {
+/* Reset and body styling */
+*,
+*::before,
+*::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+html,
 body {
+    max-width: 100%;
+    overflow-x: hidden;
+    /* This strictly forbids the webpage from stretching horizontally */
     font-family: Arial, Helvetica, sans-serif;
     background-color: #fdf8eb;
     color: #333;
@@ -509,33 +515,42 @@ figcaption a:hover {
     .doc-layout {
         flex-direction: column;
         padding: 10px;
+
+        /* THE FIX: Force the main layout to never exceed screen width */
+        width: 100vw;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     .doc-sidebar {
         position: static;
         width: auto;
-        /* Changed from 100% */
         margin-left: 20px;
-        /* Matches .card left margin */
         margin-right: 20px;
-        /* Matches .card right margin */
         flex: none;
         margin-bottom: 20px;
         box-sizing: border-box;
+    }
+
+    .doc-content {
+        /* THE FIX: Force the content column to respect the layout bounds */
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+        /* Stops inner elements from breaking out */
     }
 
     /* Stack the pagination buttons neatly on small screens */
     .doc-pagination {
         flex-direction: column;
         text-align: center;
-        /* Optional: If you want the pagination box to also perfectly match the card widths */
         margin-left: 20px;
         margin-right: 20px;
     }
 
     .doc-pagination a {
         width: 100%;
-        /* Makes the buttons stretch to fill the mobile box */
         box-sizing: border-box;
     }
 }
@@ -546,30 +561,39 @@ figcaption a:hover {
 
 /* Target the Prism.js preformatted blocks */
 pre[class*="language-"] {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+
+    /* THE NEW FIX: Enable both horizontal and vertical scrolling */
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    max-height: 500px !important;
+    /* Forces the window to stop growing vertically */
+
     border-radius: 8px !important;
     margin: 20px 0 !important;
     font-size: 14px !important;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-
-    /* THE FIX: Stop the block from stretching the card */
-    max-width: 100%;
-    overflow-x: auto !important;
 }
 
 /* Ensure long mathematical formulas or array brackets don't break the page layout */
 pre[class*="language-"] code {
     white-space: pre;
-    /* Removed overflow-x from here, as it belongs on the pre tag above */
 }
 
-/* Customizing the scrollbar for code blocks so it doesn't look clunky */
+/* Customizing the scrollbar (Updated to handle vertical too) */
 pre[class*="language-"]::-webkit-scrollbar {
     height: 8px;
+    /* Horizontal scrollbar thickness */
+    width: 8px;
+    /* Vertical scrollbar thickness */
 }
 
 pre[class*="language-"]::-webkit-scrollbar-track {
     background: #1d1d1d;
-    border-radius: 0 0 8px 8px;
+    border-radius: 8px;
 }
 
 pre[class*="language-"]::-webkit-scrollbar-thumb {
