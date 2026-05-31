@@ -7,6 +7,7 @@
     <meta name="description" content="Custom Cycloidal Actuators for 1.1m, 55lb Biped">
     <title>Actuators - 1.1m Biped</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -179,8 +180,7 @@
                     this, a hardcoded 500ms hardware watchdog guarantees the joint defaults to a safe, highly viscous
                     damping state if PC comms are lost.</p>
 
-                <pre
-                    style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 14px; margin: 20px 0;"><code>// 12-Byte Struct: PC -> STM32 (Optimized for pure impedance RL)
+                <pre><code class="language-cpp">// 12-Byte Struct: PC -> STM32 (Optimized for pure impedance RL)
 struct __attribute__((packed)) RLCommand {
   float q_des;
   float kp;
@@ -205,8 +205,7 @@ if (millis() - last_command_time > WATCHDOG_TIMEOUT_MS) {
                     Field Oriented Control (FOC) math, utilizing the STM32's hardware accelerators to physically drive
                     the inverter bridge with extreme precision.</p>
 
-                <pre
-                    style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 14px; margin: 20px 0;"><code>// --- 5. IMPEDANCE CONTROL LAW ---
+                <pre><code class="language-cpp">// --- 5. IMPEDANCE CONTROL LAW ---
 float pos_error = cmd.q_des - state.q_curr;
 float vel_error = 0.0f - state.dq_curr;
 
@@ -326,6 +325,10 @@ motor.move(-current_command);</code></pre>
             <a href="https://github.com/adamhaze8" target="_blank">GitHub</a>
         </p>
     </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
 </body>
 
 </html>

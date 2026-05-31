@@ -126,10 +126,11 @@ nav a {
     /* Each column takes up equal space */
 }
 
-/* Optional styling for the list */
-.column ul {
+/* Optional styling for the lists inside columns */
+.column ul,
+.column ol {
     list-style-type: disc;
-    padding-left: 20px;
+    padding-left: 30px;
 }
 
 .column li {
@@ -202,6 +203,7 @@ nav a {
 }
 
 /* List item spacing */
+ol,
 ul {
     padding-left: 30px;
     /* Indents the entire list, including bullets */
@@ -251,13 +253,15 @@ footer p {
     display: flex;
     flex-direction: column;
     align-items: center;
-    flex: 1; /* This is the magic line! It forces them to spread out evenly */
-    min-width: 300px; /* Prevents them from getting squished on phones */
+    flex: 1;
+    /* This is the magic line! It forces them to spread out evenly */
+    min-width: 300px;
+    /* Prevents them from getting squished on phones */
 }
 
 /* Standalone images and videos stay at 500px height */
-.image-container > img,
-.image-container > video {
+.image-container>img,
+.image-container>video {
     height: 500px;
     width: auto;
     max-width: 100%;
@@ -268,10 +272,13 @@ footer p {
 /* Images inside figures stretch to fill the expanded figure width */
 .image-container figure img {
     width: 100%;
-    height: auto; /* Maintains the aspect ratio so they don't distort */
-    max-height: 500px; /* Keeps them from getting taller than your 500px limit */
+    height: auto;
+    /* Maintains the aspect ratio so they don't distort */
+    max-height: 500px;
+    /* Keeps them from getting taller than your 500px limit */
     border-radius: 8px;
-    object-fit: contain; /* Ensures the whole CAD model stays visible */
+    object-fit: contain;
+    /* Ensures the whole CAD model stays visible */
 }
 
 .video-container {
@@ -316,8 +323,10 @@ figcaption a:hover {
 /* Forces the media blocks to evenly split the row */
 .media-half {
     display: flex;
-    flex: 1; /* This makes them share the space 50/50 */
-    min-width: 300px; /* Forces them to stack vertically on phones */
+    flex: 1;
+    /* This makes them share the space 50/50 */
+    min-width: 300px;
+    /* Forces them to stack vertically on phones */
     justify-content: center;
 }
 
@@ -394,7 +403,8 @@ figcaption a:hover {
 .doc-layout {
     display: flex;
     gap: 30px;
-    width: 100%; /* Spans the full screen */
+    width: 100%;
+    /* Spans the full screen */
     align-items: flex-start;
     padding: 20px;
 }
@@ -407,7 +417,7 @@ figcaption a:hover {
     background-color: #fff;
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border: 1px solid #eaeaea;
 }
 
@@ -419,8 +429,15 @@ figcaption a:hover {
     margin-bottom: 15px;
 }
 
-.doc-sidebar ul { list-style: none; padding: 0; margin: 0; }
-.doc-sidebar li { margin-bottom: 12px; }
+.doc-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.doc-sidebar li {
+    margin-bottom: 12px;
+}
 
 .doc-sidebar a {
     text-decoration: none;
@@ -432,7 +449,10 @@ figcaption a:hover {
     border-radius: 4px;
 }
 
-.doc-sidebar a:hover { background-color: #f8f9fa; color: #007BFF; }
+.doc-sidebar a:hover {
+    background-color: #f8f9fa;
+    color: #007BFF;
+}
 
 /* Highlight the current page */
 .doc-sidebar a.active {
@@ -442,10 +462,15 @@ figcaption a:hover {
     border-left: 4px solid #007BFF;
 }
 
-.doc-content { flex: 1; min-width: 0; }
+.doc-content {
+    flex: 1;
+    min-width: 0;
+}
 
 /* Override margin on the first card so it aligns with sidebar top */
-.doc-content .card:first-child { margin-top: 0; }
+.doc-content .card:first-child {
+    margin-top: 0;
+}
 
 /* Pagination Buttons */
 .doc-pagination {
@@ -477,6 +502,57 @@ figcaption a:hover {
 
 /* Mobile Responsiveness for Docs */
 @media (max-width: 800px) {
-    .doc-layout { flex-direction: column; padding: 10px; }
-    .doc-sidebar { position: static; width: 100%; flex: none; margin-bottom: 20px; box-sizing: border-box; }
+    .doc-layout {
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    .doc-sidebar {
+        position: static;
+        width: 100%;
+        flex: none;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+    }
+}
+
+/* =========================================
+   CODE BLOCK STYLING (Prism.js Overrides)
+   ========================================= */
+
+/* Target the Prism.js preformatted blocks */
+pre[class*="language-"] {
+    border-radius: 8px !important;
+    /* Matches your card and image border radius */
+    margin: 20px 0 !important;
+    /* Gives breathing room inside the cards */
+    font-size: 14px !important;
+    /* Keeps the text legible but compact */
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    /* Optional: adds a subtle inner depth */
+}
+
+/* Ensure long mathematical formulas or array brackets don't break the page layout */
+pre[class*="language-"] code {
+    white-space: pre;
+    overflow-x: auto;
+}
+
+/* Customizing the scrollbar for code blocks so it doesn't look clunky */
+pre[class*="language-"]::-webkit-scrollbar {
+    height: 8px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-track {
+    background: #1d1d1d;
+    border-radius: 0 0 8px 8px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-thumb:hover {
+    background: #777;
 }
