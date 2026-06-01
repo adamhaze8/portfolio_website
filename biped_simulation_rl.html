@@ -140,24 +140,22 @@
                         slack spooled out by the thigh actuator.</li>
                 </ol>
 
-                <pre><code class="language-python"> 
-    def process_actions(self, actions: torch.Tensor):
-        # 1. Latency: Shift buffer and insert new action
-        self.delay_buffer[:, 1:] = self.delay_buffer[:, :-1].clone()
-        self.delay_buffer[:, 0] = actions
+                <pre><code class="language-python">def process_actions(self, actions: torch.Tensor):
+    # 1. Latency: Shift buffer and insert new action
+    self.delay_buffer[:, 1:] = self.delay_buffer[:, :-1].clone()
+    self.delay_buffer[:, 0] = actions
 
-        # 2. Extract action based on each robot's specific random lag
-        env_indices = torch.arange(self._env.num_envs, device=self.device)
-        delayed_actions = self.delay_buffer[env_indices, self.latency_indices]
+    # 2. Extract action based on each robot's specific random lag
+    env_indices = torch.arange(self._env.num_envs, device=self.device)
+    delayed_actions = self.delay_buffer[env_indices, self.latency_indices]
 
-        # 3. Smoothing: Apply Exponential Moving Average
-        self.smoothed_actions = (self.alpha * delayed_actions) + (
-            (1.0 - self.alpha) * self.smoothed_actions
-        )
+    # 3. Smoothing: Apply Exponential Moving Average
+    self.smoothed_actions = (self.alpha * delayed_actions) + (
+        (1.0 - self.alpha) * self.smoothed_actions
+    )
 
-        # 4. Standard Processing (scaling/offsets)
-        super().process_actions(self.smoothed_actions)
-</code></pre>
+    # 4. Standard Processing (scaling/offsets)
+    super().process_actions(self.smoothed_actions)</code></pre>
 
                 <div class="image-container">
                     <img src="images/training_flowchart.png" style="height: auto; width: 100%; max-width: 2000px;"
@@ -172,13 +170,12 @@
                     <li><strong>Gait Symmetry:</strong> A custom <code>feet_air_time_symmetry</code> penalty (weight:
                         -8.0) tracks the delta between the left and right foot air times, aggressively penalizing
                         limping behaviors.</li>
-                    <pre><code class="language-python">
-    def reward_feet_air_time_symmetry(env, sensor_cfg: SceneEntityCfg) -&gt; torch.Tensor:
-        contact_sensor = env.scene.sensors[sensor_cfg.name]
-        air_time_subset = contact_sensor.data.last_air_time[:, sensor_cfg.body_ids]
-        air_time_l = air_time_subset[:, 0]
-        air_time_r = air_time_subset[:, 1]
-        return torch.abs(air_time_l - air_time_r)</code></pre>
+                    <pre><code class="language-python">def reward_feet_air_time_symmetry(env, sensor_cfg: SceneEntityCfg) -&gt; torch.Tensor:
+    contact_sensor = env.scene.sensors[sensor_cfg.name]
+    air_time_subset = contact_sensor.data.last_air_time[:, sensor_cfg.body_ids]
+    air_time_l = air_time_subset[:, 0]
+    air_time_r = air_time_subset[:, 1]
+    return torch.abs(air_time_l - air_time_r)</code></pre>
 
                     <li><strong>Motor Envelope Violation (Dynamic Stall Limits):</strong> Rather than using a generic
                         power penalty, a custom <code>penalty_motor_envelope_violation</code> calculates the dynamic
@@ -196,55 +193,53 @@
                         </figure>
                     </div>
 
-                    <pre><code class="language-python">
-    def penalty_motor_envelope_violation(env, asset_cfg: SceneEntityCfg) -&gt; torch.Tensor:
-        asset = env.scene[asset_cfg.name]
+                    <pre><code class="language-python">def penalty_motor_envelope_violation(env, asset_cfg: SceneEntityCfg) -&gt; torch.Tensor:
+    asset = env.scene[asset_cfg.name]
 
-        # 1. Initialize mapping tensors on the GPU once (Caching for performance)
-        if not hasattr(env, "_motor_specs_initialized"):
-            joint_names = asset.data.joint_names
-            num_joints = len(joint_names)
+    # 1. Initialize mapping tensors on the GPU once (Caching for performance)
+    if not hasattr(env, "_motor_specs_initialized"):
+        joint_names = asset.data.joint_names
+        num_joints = len(joint_names)
 
-            gr = torch.zeros(num_joints, device=env.device)
-            poly_a = torch.zeros(num_joints, device=env.device)
-            poly_b = torch.zeros(num_joints, device=env.device)
-            poly_c = torch.zeros(num_joints, device=env.device)
+        gr = torch.zeros(num_joints, device=env.device)
+        poly_a = torch.zeros(num_joints, device=env.device)
+        poly_b = torch.zeros(num_joints, device=env.device)
+        poly_c = torch.zeros(num_joints, device=env.device)
 
-            # Map Gear Ratios and Polynomials based on analyzer specs
-            for i, name in enumerate(joint_names):
-                if "yaw" in name or "roll" in name:
-                    gr[i] = 20.0
-                    poly_a[i], poly_b[i], poly_c[i] = 9.09, -55.05, 117.81  # G60
-                else:
-                    gr[i] = 16.0
-                    poly_a[i], poly_b[i], poly_c[i] = 3.46, -31.56, 134.04  # G80
+        # Map Gear Ratios and Polynomials based on analyzer specs
+        for i, name in enumerate(joint_names):
+            if "yaw" in name or "roll" in name:
+                gr[i] = 20.0
+                poly_a[i], poly_b[i], poly_c[i] = 9.09, -55.05, 117.81  # G60
+            else:
+                gr[i] = 16.0
+                poly_a[i], poly_b[i], poly_c[i] = 3.46, -31.56, 134.04  # G80
 
-            env._motor_gr = gr
-            env._motor_a = poly_a
-            env._motor_b = poly_b
-            env._motor_c = poly_c
-            env._motor_specs_initialized = True
+        env._motor_gr = gr
+        env._motor_a = poly_a
+        env._motor_b = poly_b
+        env._motor_c = poly_c
+        env._motor_specs_initialized = True
 
-        # 2. Extract state and convert from Joint Space to Bare Motor Space
-        tau_j = torch.abs(asset.data.applied_torque)
-        vel_j = torch.abs(asset.data.joint_vel)
+    # 2. Extract state and convert from Joint Space to Bare Motor Space
+    tau_j = torch.abs(asset.data.applied_torque)
+    vel_j = torch.abs(asset.data.joint_vel)
 
-        tau_m = tau_j / env._motor_gr
-        vel_m = vel_j * env._motor_gr
+    tau_m = tau_j / env._motor_gr
+    vel_m = vel_j * env._motor_gr
 
-        # 3. Calculate dynamic velocity limit based on current torque
-        # omega_limit = a*(tau_m^2) + b*(tau_m) + c
-        vel_limit = (env._motor_a * (tau_m**2)) + (env._motor_b * tau_m) + env._motor_c
+    # 3. Calculate dynamic velocity limit based on current torque
+    # omega_limit = a*(tau_m^2) + b*(tau_m) + c
+    vel_limit = (env._motor_a * (tau_m**2)) + (env._motor_b * tau_m) + env._motor_c
 
-        # If the limit is negative (torque is so high the motor stalls), any velocity is a violation
-        vel_limit = torch.clamp(vel_limit, min=0.0)
+    # If the limit is negative (torque is so high the motor stalls), any velocity is a violation
+    vel_limit = torch.clamp(vel_limit, min=0.0)
 
-        # 4. Calculate violation (excess velocity beyond the polynomial boundary)
-        excess_vel = torch.clamp(vel_m - vel_limit, min=0.0)
+    # 4. Calculate violation (excess velocity beyond the polynomial boundary)
+    excess_vel = torch.clamp(vel_m - vel_limit, min=0.0)
 
-        # 5. Sum the violations across all joints, squared to create a harsh penalty wall
-        return torch.sum(excess_vel**2, dim=1)
-    </code></pre>
+    # 5. Sum the violations across all joints, squared to create a harsh penalty wall
+    return torch.sum(excess_vel**2, dim=1)</code></pre>
 
                     <li><strong>Sparse Retrospective Foot Clearance:</strong> A custom <code>track_foot_clearance</code>
                         reward (weight: 5.0) continuously tracks the 3D position of the foot's lowest corner during the
@@ -258,111 +253,107 @@
                         </video>
                     </div>
 
-                    <pre><code class="language-python">
-                       
-    def reward_retrospective_max_clearance(
-        env,
-        asset_cfg: SceneEntityCfg,
-        sensor_cfg: SceneEntityCfg,
-        target_height: float,
-        x_offset: float = 0.066,  # Distance from ankle origin to sole
-        y_toe: float = 0.094,  # Distance from ankle origin to front of foot
-        y_heel: float = 0.056,  # Distance from ankle origin to back of foot
-    ) -> torch.Tensor:
-        """
-        Event-Driven Sparse Reward with Asymmetric Virtual Proxy Points.
-        Tracks the lowest point of a 2-point line (toe and heel) for each foot.
-        Automatically scales so that a max height of 0.0 (ground) results in 0.0 reward.
-        """
-        num_envs = env.num_envs
+                    <pre><code class="language-python">def reward_retrospective_max_clearance(
+    env,
+    asset_cfg: SceneEntityCfg,
+    sensor_cfg: SceneEntityCfg,
+    target_height: float,
+    x_offset: float = 0.066,  # Distance from ankle origin to sole
+    y_toe: float = 0.094,  # Distance from ankle origin to front of foot
+    y_heel: float = 0.056,  # Distance from ankle origin to back of foot
+) -> torch.Tensor:
+    """
+    Event-Driven Sparse Reward with Asymmetric Virtual Proxy Points.
+    Tracks the lowest point of a 2-point line (toe and heel) for each foot.
+    Automatically scales so that a max height of 0.0 (ground) results in 0.0 reward.
+    """
+    num_envs = env.num_envs
 
-        # 1. Initialize persistent buffers
-        if not hasattr(env, "max_foot_z"):
-            env.max_foot_z = torch.zeros((num_envs, 2), device=env.device)
-            env.last_contact = torch.ones(
-                (num_envs, 2), dtype=torch.bool, device=env.device
-            )
-
-        # 2. Get Ankle Positions, Orientations, and Contact Forces
-        ankle_pos = env.scene[asset_cfg.name].data.body_pos_w[:, asset_cfg.body_ids]
-        ankle_quat = env.scene[asset_cfg.name].data.body_quat_w[:, asset_cfg.body_ids]
-        contact_forces = env.scene[sensor_cfg.name].data.net_forces_w[
-            :, sensor_cfg.body_ids, 2
-        ]
-
-        current_contact = contact_forces > 1.0
-
-        # 3. Define the 2-point line (Toe, Heel) for each foot individually
-        # Left foot: Y-axis is flipped (Toe is -y, Heel is +y)
-        points_local_l = torch.tensor(
-            [
-                [x_offset, -y_toe, 0.0],
-                [x_offset, y_heel, 0.0],
-            ],
-            device=env.device,
-            dtype=torch.float32,
+    # 1. Initialize persistent buffers
+    if not hasattr(env, "max_foot_z"):
+        env.max_foot_z = torch.zeros((num_envs, 2), device=env.device)
+        env.last_contact = torch.ones(
+            (num_envs, 2), dtype=torch.bool, device=env.device
         )
 
-        # Right foot: Standard orientation (Toe is +y, Heel is -y)
-        points_local_r = torch.tensor(
-            [
-                [x_offset, y_toe, 0.0],
-                [x_offset, -y_heel, 0.0],
-            ],
-            device=env.device,
-            dtype=torch.float32,
-        )
+    # 2. Get Ankle Positions, Orientations, and Contact Forces
+    ankle_pos = env.scene[asset_cfg.name].data.body_pos_w[:, asset_cfg.body_ids]
+    ankle_quat = env.scene[asset_cfg.name].data.body_quat_w[:, asset_cfg.body_ids]
+    contact_forces = env.scene[sensor_cfg.name].data.net_forces_w[
+        :, sensor_cfg.body_ids, 2
+    ]
 
-        def get_lowest_point_z(pos, quat, local_points):
-            lowest_z = torch.full((num_envs,), float("inf"), device=env.device)
-            for i in range(2):  # Only evaluating 2 points now
-                point_vec = local_points[i].unsqueeze(0).expand(num_envs, 3)
-                rotated_point = quat_apply(quat, point_vec)
-                world_point = pos + rotated_point
-                lowest_z = torch.minimum(lowest_z, world_point[:, 2])
-            return lowest_z
+    current_contact = contact_forces > 1.0
 
-        # Pass the specific Left/Right local point tensors into the calculator
-        lowest_z_l = get_lowest_point_z(
-            ankle_pos[:, 0, :], ankle_quat[:, 0, :], points_local_l
-        )
-        lowest_z_r = get_lowest_point_z(
-            ankle_pos[:, 1, :], ankle_quat[:, 1, :], points_local_r
-        )
+    # 3. Define the 2-point line (Toe, Heel) for each foot individually
+    # Left foot: Y-axis is flipped (Toe is -y, Heel is +y)
+    points_local_l = torch.tensor(
+        [
+            [x_offset, -y_toe, 0.0],
+            [x_offset, y_heel, 0.0],
+        ],
+        device=env.device,
+        dtype=torch.float32,
+    )
 
-        lowest_foot_z = torch.stack([lowest_z_l, lowest_z_r], dim=1)
+    # Right foot: Standard orientation (Toe is +y, Heel is -y)
+    points_local_r = torch.tensor(
+        [
+            [x_offset, y_toe, 0.0],
+            [x_offset, -y_heel, 0.0],
+        ],
+        device=env.device,
+        dtype=torch.float32,
+    )
 
-        # 4. Update Max Z buffer
-        in_air = ~current_contact
-        env.max_foot_z = torch.where(
-            in_air, torch.maximum(env.max_foot_z, lowest_foot_z), env.max_foot_z
-        )
+    def get_lowest_point_z(pos, quat, local_points):
+        lowest_z = torch.full((num_envs,), float("inf"), device=env.device)
+        for i in range(2):  # Only evaluating 2 points now
+            point_vec = local_points[i].unsqueeze(0).expand(num_envs, 3)
+            rotated_point = quat_apply(quat, point_vec)
+            world_point = pos + rotated_point
+            lowest_z = torch.minimum(lowest_z, world_point[:, 2])
+        return lowest_z
 
-        # 5. Detect Touchdown Event
-        touchdown = (~env.last_contact) & current_contact
+    # Pass the specific Left/Right local point tensors into the calculator
+    lowest_z_l = get_lowest_point_z(
+        ankle_pos[:, 0, :], ankle_quat[:, 0, :], points_local_l
+    )
+    lowest_z_r = get_lowest_point_z(
+        ankle_pos[:, 1, :], ankle_quat[:, 1, :], points_local_r
+    )
 
-        # 6. Calculate Linear Error
-        error_l = torch.abs(env.max_foot_z[:, 0] - target_height)
-        error_r = torch.abs(env.max_foot_z[:, 1] - target_height)
+    lowest_foot_z = torch.stack([lowest_z_l, lowest_z_r], dim=1)
 
-        # 7. Apply Dynamic Scaling
-        raw_reward_l = torch.clamp(1.0 - (error_l / target_height), min=0.0)
-        raw_reward_r = torch.clamp(1.0 - (error_r / target_height), min=0.0)
+    # 4. Update Max Z buffer
+    in_air = ~current_contact
+    env.max_foot_z = torch.where(
+        in_air, torch.maximum(env.max_foot_z, lowest_foot_z), env.max_foot_z
+    )
 
-        reward_l = raw_reward_l * touchdown[:, 0].float()
-        reward_r = raw_reward_r * touchdown[:, 1].float()
+    # 5. Detect Touchdown Event
+    touchdown = (~env.last_contact) & current_contact
 
-        # 8. Reset the maximum tracker
-        env.max_foot_z = torch.where(
-            touchdown, torch.zeros_like(env.max_foot_z), env.max_foot_z
-        )
+    # 6. Calculate Linear Error
+    error_l = torch.abs(env.max_foot_z[:, 0] - target_height)
+    error_r = torch.abs(env.max_foot_z[:, 1] - target_height)
 
-        # 9. Save current contact state
-        env.last_contact = current_contact
+    # 7. Apply Dynamic Scaling
+    raw_reward_l = torch.clamp(1.0 - (error_l / target_height), min=0.0)
+    raw_reward_r = torch.clamp(1.0 - (error_r / target_height), min=0.0)
 
-        return reward_l + reward_r
+    reward_l = raw_reward_l * touchdown[:, 0].float()
+    reward_r = raw_reward_r * touchdown[:, 1].float()
 
-                    </code></pre>
+    # 8. Reset the maximum tracker
+    env.max_foot_z = torch.where(
+        touchdown, torch.zeros_like(env.max_foot_z), env.max_foot_z
+    )
+
+    # 9. Save current contact state
+    env.last_contact = current_contact
+
+    return reward_l + reward_r</code></pre>
                 </ul>
             </section>
 

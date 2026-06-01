@@ -10,7 +10,6 @@
 html,
 body {
     max-width: 100%;
-    overflow-x: hidden;
     /* This strictly forbids the webpage from stretching horizontally */
     font-family: Arial, Helvetica, sans-serif;
     background-color: #fdf8eb;
@@ -136,7 +135,6 @@ nav a {
 .column ul,
 .column ol {
     list-style-type: disc;
-    padding-left: 30px;
 }
 
 .column li {
@@ -188,10 +186,7 @@ nav a {
 
 /* Card styling: general styling for cards, max width, padding */
 .card {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    margin-left: 20px;
-    margin-right: 20px;
+    margin: 20px;
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
@@ -268,16 +263,6 @@ footer p {
     /* Prevents them from getting squished on phones */
 }
 
-/* Standalone images and videos stay at 500px height */
-.image-container>img,
-.image-container>video {
-    height: 500px;
-    width: auto;
-    max-width: 100%;
-    border-radius: 8px;
-    object-fit: cover;
-}
-
 /* Images inside figures stretch to fill the expanded figure width */
 .image-container figure img {
     width: 100%;
@@ -288,6 +273,16 @@ footer p {
     border-radius: 8px;
     object-fit: contain;
     /* Ensures the whole CAD model stays visible */
+}
+
+/* Standalone images and videos stay at 500px height */
+.image-container>img,
+.image-container>video {
+    height: 700px;
+    width: auto;
+    max-width: 100%;
+    border-radius: 8px;
+    object-fit: cover;
 }
 
 .video-container {
@@ -491,6 +486,10 @@ figcaption a:hover {
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.doc-pagination.right-only {
+    justify-content: flex-end;
 }
 
 .doc-pagination a {

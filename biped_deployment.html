@@ -74,6 +74,12 @@
                     pipeline, randomly shifting mass distribution and center-of-mass coordinates. This successfully
                     trained the policy to dynamically correct its balance, eliminating the forward bias.</p>
 
+                <div class="image-container">
+                    <video autoplay loop muted playsinline>
+                        <source src="videos/biped_testing_forward_bias.mp4" type="video/mp4">
+                    </video>
+                </div>
+
                 <h3>Command Latency & Final Stabilization</h3>
                 <p>Despite walking in place without drifting, the steps were still too fast and the robot struggled to
                     hold its own weight confidently during the swing phase. This pointed to a classic latency gap: the
@@ -82,6 +88,14 @@
                     the training environment. Observations were slightly delayed, and significant randomized latency (up
                     to 3 control steps, or 60ms) was applied to the action outputs. Training the policy to predictively
                     handle this lag resulted in the final, stable marching gait.</p>
+
+
+                <div class="image-container">
+                    <video autoplay loop muted playsinline>
+                        <source src="videos/biped_testing_fast_walk.mp4" type="video/mp4">
+                    </video>
+                </div>
+
             </section>
 
             <section class="card">
@@ -110,6 +124,270 @@
                         actuators do not melt their PETG housings during extended operation.</li>
                 </ul>
 
+
+                <pre><code class="language-python">class IMUNode:
+    def __init__(self, calibration_file="biped_calibration.json"):
+        # Shared memory arrays (C-type doubles) for Cross-Process communication
+        self._omega = multiprocessing.Array("d", 3)
+        self._gravity = multiprocessing.Array("d", 3)
+        self._theta = multiprocessing.Array("d", 3)
+        self._is_connected = multiprocessing.Value("b", False)
+
+        self._gravity[:] = [0.0, 0.0, -1.0]
+
+        # --- Load Calibration Offsets ---
+        offset_tx = 0.0
+        offset_ty = 0.0
+        offset_tz = 0.0
+        try:
+            with open(calibration_file, "r") as f:
+                calib = json.load(f)
+                imu_offsets = calib.get("imu_offsets_radians", {})
+                offset_tx = imu_offsets.get("theta_x", 0.0)
+                offset_ty = imu_offsets.get("theta_y", 0.0)
+                offset_tz = imu_offsets.get("theta_z", 0.0)
+                print(
+                    f"[IMU] Loaded Calibration Offsets (rad) - X:{offset_tx}, Y:{offset_ty}, Z:{offset_tz}"
+                )
+        except FileNotFoundError:
+            print(
+                f"[IMU] WARNING: {calibration_file} not found. Defaulting IMU offsets to 0.0"
+            )
+
+        # Start the fully isolated hardware process
+        self.process = multiprocessing.Process(
+            target=self._hardware_process,
+            args=(
+                self._omega,
+                self._gravity,
+                self._theta,
+                self._is_connected,
+                offset_tx,
+                offset_ty,
+                offset_tz,
+            ),
+            daemon=True,
+        )
+        self.process.start()
+
+        print("[IMU] Waiting for isolated multi-processing hardware engine to boot...")
+        start_wait = time.time()
+        while not self._is_connected.value and time.time() - start_wait < 5.0:
+            time.sleep(0.1)
+
+        if not self._is_connected.value:
+            print("[FATAL] IMU Process failed to connect to BNO085.")
+        else:
+            print("[+] IMU Multi-Processing Engine Active. Python GIL bypassed.")
+
+    # Using @property decorators so march_in_place.py can access these exactly like normal lists
+    @property
+    def is_connected(self):
+        return self._is_connected.value
+
+    @property
+    def omega(self):
+        return list(self._omega)
+
+    @property
+    def projected_gravity(self):
+        return list(self._gravity)
+
+    @property
+    def theta(self):
+        return list(self._theta)
+
+    @staticmethod
+    def _hardware_process(shared_omega, shared_gravity, shared_theta, is_connected, off_tx, off_ty, off_tz):
+        # 1. Demand high priority from the Linux CPU Scheduler
+        import os
+        try:
+            os.nice(-10) # Negative numbers equal higher priority in Linux
+        except PermissionError:
+            pass # Fails gracefully if script isn't run with sudo
+            
+        # Imports MUST be inside the process so they bind to the new memory space
+        from adafruit_extended_bus import ExtendedI2C as I2C
+        from adafruit_bno08x.i2c import BNO08X_I2C
+        from adafruit_bno08x import BNO_REPORT_GYROSCOPE, BNO_REPORT_GAME_ROTATION_VECTOR
+        import time
+        import math
+        
+        # ... [rest of the hardware loop]
+
+        try:
+            i2c = I2C(3)
+            bno = BNO08X_I2C(i2c, address=0x4A)
+
+            features_enabled = False
+            for _ in range(5):
+                try:
+                    bno.enable_feature(BNO_REPORT_GYROSCOPE, report_interval=2500)
+                    bno.enable_feature(
+                        BNO_REPORT_GAME_ROTATION_VECTOR, report_interval=2500
+                    )
+                    features_enabled = True
+                    break
+                except RuntimeError:
+                    time.sleep(0.5)
+
+            if not features_enabled:
+                return  # Exits the process cleanly, is_connected stays False
+
+            is_connected.value = True
+
+            while True:
+                try:
+                    ox, oy, oz = bno.gyro
+                    qx, qy, qz, qw = bno.game_quaternion
+
+                    shared_omega[:] = [ox, oy, oz]
+
+                    # Math
+                    sinx_cosy = 2.0 * (qw * qx + qy * qz)
+                    cosx_cosy = 1.0 - 2.0 * (qx * qx + qy * qy)
+                    raw_tx = math.atan2(sinx_cosy, cosx_cosy)
+
+                    siny = 2.0 * (qw * qy - qz * qx)
+                    if abs(siny) >= 1:
+                        raw_ty = math.copysign(math.pi / 2.0, siny)
+                    else:
+                        raw_ty = math.asin(siny)
+
+                    sinz_cosy = 2.0 * (qw * qz + qx * qy)
+                    cosz_cosy = 1.0 - 2.0 * (qy * qy + qz * qz)
+                    raw_tz = math.atan2(sinz_cosy, cosz_cosy)
+
+                    tx = raw_tx - off_tx
+                    ty = raw_ty - off_ty
+                    tz = raw_tz - off_tz
+
+                    shared_theta[:] = [tx, ty, tz]
+
+                    gx = math.sin(ty)
+                    gy = -math.sin(tx) * math.cos(ty)
+                    gz = -math.cos(tx) * math.cos(ty)
+
+                    shared_gravity[:] = [gx, gy, gz]
+
+                except Exception:
+                    pass
+                #time.sleep(0.001)
+
+        except Exception:
+            pass
+
+    def stop(self):
+        if hasattr(self, "process"):
+            self.process.terminate()
+            self.process.join()</code></pre>
+
+                <pre><code class="language-python">class ActuatorNode:
+    def __init__(self, joint_name, port, hw_offset, math_offset):
+        self.joint_name = joint_name
+        self.total_offset_rad = hw_offset + math_offset
+        self.pos_min, self.pos_max = ACTUATOR_LIMITS[self.joint_name]
+
+        self.last_q_des = None
+        self.last_cmd_time = None
+        self.last_kp = None
+
+        self.ser = serial.Serial(port, BAUD_RATE, timeout=0.01)
+        self.ser.reset_input_buffer()
+        self.ser.reset_output_buffer()
+
+        self.q_curr = None
+        self.dq_curr = 0.0
+
+        # --- THERMAL ESTIMATOR CONFIGURATION ---
+        self.temperature = 25.0
+        self.t_ambient = 25.0
+        self.thermal_trip_limit = 100.0
+
+        if "hip_roll" in self.joint_name or "hip_yaw" in self.joint_name:
+            self.Kt, self.R_phase, self.C_th, self.gear_ratio = 0.205, 1.2, 135.0, 20.0
+        else:
+            self.Kt, self.R_phase, self.C_th, self.gear_ratio = 0.178, 0.45, 189.0, 16.0
+
+        self.tau_th = 400.0
+
+    async def verify_firmware(self):
+        try:
+            self.ser.reset_input_buffer()
+            cmd_bytes = struct.pack("<fff", 0.0, 0.0, 0.0)
+            self.ser.write(cmd_bytes)
+            await asyncio.sleep(0.05)
+
+            bytes_waiting = self.ser.in_waiting
+            if bytes_waiting > 0:
+                state_data = self.ser.read(bytes_waiting)
+                if len(state_data) % 16 == 0 and len(state_data) % 12 != 0:
+                    return False
+                return True
+            return False
+        except Exception:
+            return False
+
+    async def transact(self, q_des, kp, kd):
+        """Standard 12-byte fast operation loop with Virtual Wall Soft Limits."""
+        # 1. Dynamic Virtual Wall (Conditional Soft Limit)
+        safe_q_des = q_des
+        if self.q_curr is not None:
+            if self.q_curr < self.pos_min:
+                # Physically breached minimum. Only allow commands that push it back in.
+                safe_q_des = max(self.pos_min, q_des)
+            elif self.q_curr > self.pos_max:
+                # Physically breached maximum. Only allow commands that push it back in.
+                safe_q_des = min(self.pos_max, q_des)
+
+        # 2. Timing & State
+        curr_time = time.perf_counter()
+        dt = 0.0 if self.last_cmd_time is None else curr_time - self.last_cmd_time
+
+        self.last_q_des = safe_q_des
+        self.last_kp = kp
+        self.last_cmd_time = curr_time
+
+        # 3. USB Transaction
+        try:
+            raw_q_des = safe_q_des + self.total_offset_rad
+            cmd_bytes = struct.pack("<fff", raw_q_des, kp, kd)
+            self.ser.write(cmd_bytes)
+
+            attempts = 0
+            while self.ser.in_waiting < 12 and attempts < 50:
+                await asyncio.sleep(0.001)
+                attempts += 1
+
+            if self.ser.in_waiting >= 12:
+                state_data = self.ser.read(self.ser.in_waiting)
+                q, dq, tau_actuator = struct.unpack("<fff", state_data[-12:])
+
+                self.q_curr = q - self.total_offset_rad
+                self.dq_curr = dq
+
+                # 4. Thermal Model
+                tau_actuator = abs(tau_actuator) / self.gear_ratio
+                current = tau_actuator / self.Kt
+                p_loss = (current**2) * self.R_phase
+
+                if dt > 0.001:
+                    heating_rate = p_loss / self.C_th
+                    cooling_rate = (self.temperature - self.t_ambient) / self.tau_th
+                    self.temperature += (heating_rate - cooling_rate) * dt
+
+                if self.temperature > self.thermal_trip_limit:
+                    print(
+                        f"\n[THERMAL FAULT] {self.joint_name} over {self.thermal_trip_limit}C! (Est: {self.temperature:.1f}C)"
+                    )
+                    return False
+
+                return True
+
+            return False
+        except Exception:
+            return False</code></pre>
+
                 <h3>march_in_place.py (Execution State Machine)</h3>
                 <p>This is the primary asynchronous execution script. It utilizes <code>asyncio.gather</code> to
                     concurrently dispatch serial commands to all ten nodes and follows a strict, safe progression to
@@ -122,6 +400,15 @@
                     high-frequency telemetry is simultaneously buffered and dumped to a CSV upon completion for
                     post-flight analysis.</p>
 
+                <div class="image-container">
+                    <figure>
+                        <img src="images/biped_hardware_deployment_log_diagnostics.png"
+                            style="width: 100%; max-width: 2500px; max-height: none;"
+                            alt="Biped Hardware Deployment Log Diagnostics">
+                        <figcaption>Hardware deployment logs visualized</figcaption>
+                    </figure>
+                </div>
+
                 <h3>Calibration & Diagnostic Utilities</h3>
                 <p>A suite of secondary scripts was developed to support hardware deployment.
                     <code>calibrate_biped.py</code> automates the extraction of absolute physical zero-offsets and IMU
@@ -129,7 +416,8 @@
                     specialized stress-testing tools like <code>print_joint_angles.py</code> and
                     <code>imu_test.py</code> are utilized to verify USB bandwidth headroom and Inter-Process
                     Communication (IPC) stability, ensuring the Pi can consistently meet the 20ms cycle budget before
-                    the full neural network is engaged.</p>
+                    the full neural network is engaged.
+                </p>
 
             </section>
 
