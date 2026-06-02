@@ -10,11 +10,11 @@
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-C4KZZE8LH3"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-    gtag('config', 'G-C4KZZE8LH3');
+        gtag('config', 'G-C4KZZE8LH3');
     </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
 </head>
@@ -95,8 +95,7 @@
                     neural network was issuing commands and expecting instant physical torque, leading to thrashing when
                     the physical hardware inevitably lagged behind. To bridge this, a dynamic delay was implemented in
                     the training environment. Observations were slightly delayed, and significant randomized latency (up
-                    to 3 control steps, or 60ms) was applied to the action outputs. Training the policy to predictively
-                    handle this lag resulted in the final, stable marching gait.</p>
+                    to 3 control steps, or 60ms) was applied to the action outputs.</p>
 
 
                 <div class="image-container">
@@ -104,7 +103,11 @@
                         <source src="videos/biped_testing_fast_walk.mp4" type="video/mp4">
                     </video>
                 </div>
-
+                <!-- NEW DISCLAIMER -->
+                <p
+                    style="color: #D32F2F; font-size: 1.25em; font-weight: bold; text-align: center; margin: 30px 0; border: 2px solid #D32F2F; padding: 15px; border-radius: 8px;">
+                    ⚠️ DISCLAIMER: This project is currently ongoing and the final result has not yet been reached.
+                </p>
             </section>
 
             <section class="card">
