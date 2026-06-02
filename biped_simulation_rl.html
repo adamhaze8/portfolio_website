@@ -8,6 +8,15 @@
     <title>Simulation & RL - 1.1m Biped</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C4KZZE8LH3"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-C4KZZE8LH3');
+    </script>
 </head>
 
 <body>
@@ -128,16 +137,13 @@
                         (0.5x to 1.5x) and actuator stiffness.</li>
                 </ul>
 
-                <h3>The Action Wrapper: Smoothing & Belt Decoupling</h3>
+                <h3>The Action Wrapper: Latency & Smoothing</h3>
                 <p>The custom <code>BipedActuatorAction</code> wrapper acts as the final middleware between the Neural
-                    Network and the Isaac Lab physics engine. It performs three crucial tasks:</p>
+                    Network and the Isaac Lab physics engine. It performs two crucial tasks:</p>
                 <ol>
                     <li>Applies the randomized 20-60ms latency.</li>
                     <li>Applies an Exponential Moving Average (EMA) filter (<code>alpha = 0.3</code>) to the actions,
                         damping high-frequency twitches that would otherwise destroy the physical gearboxes.</li>
-                    <li>Executes the Forward Kinematics decoupling for the dual-stage ankle belt
-                        (<code>ankle_cmd -= knee_cmd</code>), ensuring the physics engine correctly models the physical
-                        slack spooled out by the thigh actuator.</li>
                 </ol>
 
                 <pre><code class="language-python">def process_actions(self, actions: torch.Tensor):
