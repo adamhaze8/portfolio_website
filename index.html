@@ -10,12 +10,12 @@
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-C4KZZE8LH3"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-    gtag('config', 'G-C4KZZE8LH3');
-</script>
+        gtag('config', 'G-C4KZZE8LH3');
+    </script>
 </head>
 
 <body>
@@ -46,16 +46,20 @@
         </section>
 
         <!-- NEW HERO SECTION: Custom Biped (Clickable Card) -->
-        <a href="biped_overview.html" class="card hero-card" style="display: block; text-decoration: none; color: inherit; border: 2px solid #007BFF; padding: 20px; border-radius: 12px; background-color: #ffffff;">
-            
+        <a href="biped_overview.html" class="card hero-card"
+            style="display: block; text-decoration: none; color: inherit; border: 2px solid #007BFF; padding: 20px; border-radius: 12px; background-color: #ffffff;">
+
             <!-- Side-by-Side Videos Container -->
             <div style="display: flex; gap: 15px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap;">
                 <!-- Real World Video -->
-                <video src="videos/biped_walking_real.mp4" alt="Real World Walking Tests" autoplay muted loop playsinline style="flex: 1; min-width: 280px; width: 100%; max-height: 450px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;">
+                <video src="videos/biped_testing_first_success.mp4" alt="Real World Walking Tests" autoplay muted loop
+                    playsinline
+                    style="flex: 1; min-width: 280px; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;">
                     Your browser does not support the video tag.
                 </video>
                 <!-- Simulation Video -->
-                <video src="videos/isaac_lab_training.mp4" alt="Isaac Lab Simulation" autoplay muted loop playsinline style="flex: 1; min-width: 280px; width: 100%; max-height: 450px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;">
+                <video src="videos/biped_rough_terrain.mp4" alt="Isaac Lab Simulation" autoplay muted loop playsinline
+                    style="flex: 1; min-width: 280px; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;">
                     Your browser does not support the video tag.
                 </video>
             </div>
@@ -63,8 +67,13 @@
             <!-- Text Section -->
             <div class="card-content" style="padding: 10px;">
                 <h1 style="margin-top: 0; color: #333;">1.1m, 55lb Custom 10-DOF Humanoid Biped</h1>
-                <h3 style="color: #555;">Zero-Shot Sim-to-Real RL • Distributed Impedance Control • Scratch-Built Hardware</h3>
-                <p style="color: #333;">A 25kg bipedal humanoid engineered entirely from scratch. Features a 6061 Aluminum chassis, mathematically decoupled dual-stage belt kinematics, and robust proximal policy optimization (PPO) trained via NVIDIA Isaac Lab. Capable of dynamic balancing and rough terrain traversal.</p>
+                <h3 style="color: #555;">Zero-Shot Sim-to-Real RL • Distributed Impedance Control • Scratch-Built
+                    Hardware</h3>
+                <p style="color: #333;">A 25kg bipedal humanoid engineered entirely from scratch. Modular design
+                    assembled with custom actuators, mathematically decoupled dual-stage belt kinematics, and robust
+                    proximal policy
+                    optimization (PPO) trained via NVIDIA Isaac Lab. Capable of dynamic balancing and rough terrain
+                    traversal.</p>
             </div>
         </a>
         <!-- END HERO SECTION -->
