@@ -50,7 +50,7 @@
         <div class="doc-content">
 
             <section class="card">
-                <h1 style="margin-top: 0;">1. Sim-to-Real Development Timeline</h1>
+                <h1 style="margin-top: 0;">Sim-to-Real Development Timeline</h1>
                 <p>Transferring a policy from a pristine simulation environment to a custom-built, 25kg physical
                     platform is an iterative process of identifying and bridging reality gaps. What follows is the
                     chronological debugging sequence required to achieve stable stationary walking.</p>
@@ -83,11 +83,17 @@
                     pipeline, randomly shifting mass distribution and center-of-mass coordinates. This successfully
                     trained the policy to dynamically correct its balance, eliminating the forward bias.</p>
 
+
                 <div class="image-container">
                     <video autoplay loop muted playsinline>
                         <source src="videos/biped_testing_forward_bias.mp4" type="video/mp4">
                     </video>
+
+                    <video autoplay loop muted playsinline>
+                        <source src="videos/biped_testing_fast_walk.mp4" type="video/mp4">
+                    </video>
                 </div>
+
 
                 <h3>Command Latency & Final Stabilization</h3>
                 <p>Despite walking in place without drifting, the steps were still too fast and the robot struggled to
@@ -97,12 +103,12 @@
                     the training environment. Observations were slightly delayed, and significant randomized latency (up
                     to 3 control steps, or 60ms) was applied to the action outputs.</p>
 
-
                 <div class="image-container">
                     <video autoplay loop muted playsinline>
-                        <source src="videos/biped_testing_fast_walk.mp4" type="video/mp4">
+                        <source src="videos/biped_testing_best.mp4" type="video/mp4">
                     </video>
                 </div>
+
                 <!-- NEW DISCLAIMER -->
                 <p
                     style="color: #D32F2F; font-size: 1.25em; font-weight: bold; text-align: center; margin: 30px 0; border: 2px solid #D32F2F; padding: 15px; border-radius: 8px;">
@@ -111,7 +117,7 @@
             </section>
 
             <section class="card">
-                <h1 style="margin-top: 0;">2. Deployment Software Stack</h1>
+                <h1 style="margin-top: 0;">Deployment Software Stack</h1>
                 <p>To execute the trained policy safely on heavy hardware, a robust, multi-threaded Python architecture
                     was developed. The stack relies on asynchronous I/O and strict memory isolation to sustain a
                     continuous 50Hz control loop without blocking sensor reads or dropping neural network frames.</p>
