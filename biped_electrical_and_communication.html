@@ -9,11 +9,11 @@
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-C4KZZE8LH3"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-    gtag('config', 'G-C4KZZE8LH3');
+        gtag('config', 'G-C4KZZE8LH3');
     </script>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -50,7 +50,7 @@
         <div class="doc-content">
 
             <section class="card">
-                <h1 style="margin-top: 0;">1. Power Delivery Architecture</h1>
+                <h1 style="margin-top: 0;">Power Delivery Architecture</h1>
 
                 <p>Driving 10 independent high-torque brushless actuators creates immense power demands. The entire
                     powertrain operates on a <strong>24V main power bus</strong>, which regularly draws massive amperage
@@ -104,7 +104,7 @@
             </section>
 
             <section class="card">
-                <h1 style="margin-top: 0;">2. Communication & Control Topology</h1>
+                <h1 style="margin-top: 0;">Communication & Control Topology</h1>
 
                 <p>Because the low-level impedance calculations are natively handled by the STM32 microcontrollers on
                     each joint, the master control PC is strictly responsible for high-level neural network inference
@@ -134,26 +134,24 @@
                 </ul>
 
                 <h3>State Estimation & The BNO085 Protocol Journey</h3>
-                <p>Extracting high-fidelity orientation data from the BNO085 IMU on a Raspberry Pi running user-space
-                    Ubuntu required navigating several strict hardware-OS limitations before arriving at a stable
-                    architecture:</p>
+                <p>To achieve pristine, zero-latency balancing, we transitioned our BNO085 IMU from UART-RVC to I2C.
+                    However, extracting high-frequency hardware gyro data on a Raspberry Pi required bypassing severe
+                    hardware flaws:</p>
                 <ul>
-                    <li><strong>I2C (Abandoned):</strong> The Pi's hardware has a notorious bug handling I2C
-                        clock-stretching. Because the BNO085 relies heavily on clock-stretching to format its data
-                        packets, the bus repeatedly locked up, resulting in unacceptably slow and stale telemetry.</li>
-                    <li><strong>SPI (Abandoned):</strong> The IMU's standard SHTP protocol over SPI relies on strict
-                        hardware interrupt (INT) timing. Because Ubuntu is not a Real-Time OS, the kernel's user-space
-                        latency caused the Pi to constantly miss the interrupt windows, resulting in dropped frames.
+                    <li><strong>UART-RVC (Abandoned):</strong> While highly stable, this mode lacked raw angular
+                        velocity data. Deriving velocity mathematically introduced phase lag and noise that destabilized
+                        the biped's control loop.</li>
+                    <li><strong>Hardware I2C (Abandoned):</strong> The Pi's hardware I2C controller possesses a
+                        decade-old silicon bug preventing proper clock-stretching. This caused the Pi to ignore the
+                        IMU's calculation pauses, resulting in stale data reads and protocol crashes.</li>
+                    <li><strong>The Solution — Software Bitbanging:</strong> We bypassed the Pi's broken hardware
+                        controller entirely by using the <code>i2c-gpio</code> overlay. By mapping the IMU's SDA and SCL
+                        to independent GPIO pins (23 and 24), the CPU handles communication via software bitbanging.
                     </li>
-                    <li><strong>Standard UART (Abandoned):</strong> Attempting standard UART resulted in the same SHTP
-                        protocol overhead, where slight OS-level handshake delays triggered continuous `Watchdog
-                        timeout!` resets on the sensor.</li>
-                    <li><strong>The Solution — UART-RVC Mode:</strong> The IMU is hardwired into UART-RVC (Robot Vacuum
-                        Cleaner) mode. This entirely disables the complex SHTP handshake protocol. Instead, the BNO085
-                        acts as a pure stream, continuously transmitting a highly optimized, raw 19-byte packet of
-                        calibrated Yaw, Pitch, Roll, and Acceleration data at a strict 100Hz (115200 baud). This
-                        elegantly bypasses all Linux kernel timing limitations, providing a bulletproof state estimation
-                        stream for the Neural Network.</li>
+                    <li><strong>The Result:</strong> The software driver flawlessly respects the IMU's clock-stretching.
+                        Even while competing with 10 USB serial motors for CPU interrupts, this architecture delivers
+                        absolute, zero-noise physics data at a highly stable 50 Hz, completely eliminating the D-gain
+                        phase lag.</li>
                 </ul>
 
                 <div class="image-container">
