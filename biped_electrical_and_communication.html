@@ -134,9 +134,9 @@
                 </ul>
 
                 <h3>State Estimation & The BNO085 Protocol Journey</h3>
-                <p>To achieve pristine, zero-latency balancing, we transitioned our BNO085 IMU from UART-RVC to I2C.
-                    However, extracting high-frequency hardware gyro data on a Raspberry Pi required bypassing severe
-                    hardware flaws:</p>
+                <p>To achieve pristine, zero-latency balancing, the BNO085 IMU was transitioned from UART-RVC to I2C.
+                    However, extracting high-frequency hardware gyro data on a Raspberry Pi required bypassing several
+                    severe hardware flaws:</p>
                 <ul>
                     <li><strong>UART-RVC (Abandoned):</strong> While highly stable, this mode lacked raw angular
                         velocity data. Deriving velocity mathematically introduced phase lag and noise that destabilized
@@ -144,14 +144,12 @@
                     <li><strong>Hardware I2C (Abandoned):</strong> The Pi's hardware I2C controller possesses a
                         decade-old silicon bug preventing proper clock-stretching. This caused the Pi to ignore the
                         IMU's calculation pauses, resulting in stale data reads and protocol crashes.</li>
-                    <li><strong>The Solution — Software Bitbanging:</strong> We bypassed the Pi's broken hardware
-                        controller entirely by using the <code>i2c-gpio</code> overlay. By mapping the IMU's SDA and SCL
-                        to independent GPIO pins (23 and 24), the CPU handles communication via software bitbanging.
-                    </li>
-                    <li><strong>The Result:</strong> The software driver flawlessly respects the IMU's clock-stretching.
-                        Even while competing with 10 USB serial motors for CPU interrupts, this architecture delivers
-                        absolute, zero-noise physics data at a highly stable 50 Hz, completely eliminating the D-gain
-                        phase lag.</li>
+                    <li><strong>The Solution — Software Bitbanging:</strong> The Pi's broken hardware controller was
+                        bypassed entirely using the <code>i2c-gpio</code> overlay. By mapping the IMU's SDA and SCL to
+                        independent GPIO pins (23 and 24), the CPU handles communication via software bitbanging,
+                        flawlessly respecting the IMU's clock-stretching. Even while competing with 10 USB serial motors
+                        for CPU interrupts, this architecture delivers absolute, zero-noise physics data at a highly
+                        stable 50 Hz, completely eliminating the D-gain phase lag.</li>
                 </ul>
 
                 <div class="image-container">
