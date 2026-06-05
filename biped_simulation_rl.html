@@ -247,11 +247,13 @@
     # 5. Sum the violations across all joints, squared to create a harsh penalty wall
     return torch.sum(excess_vel**2, dim=1)</code></pre>
 
-                    <li><strong>Sparse Retrospective Foot Clearance:</strong> A custom <code>track_foot_clearance</code>
-                        reward (weight: 5.0) continuously tracks the 3D position of the foot's lowest corner during the
-                        swing phase. Upon touchdown, it evaluates the step retrospectively, applying a sparse reward
-                        that linearly targets a maximum apex height of 0.08m. This guarantees enough clearance to
-                        prevent toe-stubbing on physical hardware without wasting energy on excessively high steps.</li>
+                     <li><strong>Sparse Retrospective Foot Clearance:</strong> A custom <code>track_foot_clearance</code>
+    reward continuously tracks the 3D position of the foot's lowest corner during the
+    swing phase. Upon touchdown, it evaluates the step retrospectively, applying a sparse reward
+    that linearly targets a maximum apex height of 0.08m. This reward is time-integrated 
+    (scaled by the total air time) to prevent the policy from discovering a fast marching exploit 
+    to rapidly farm rewards. This guarantees enough clearance to prevent toe-stubbing on physical hardware 
+    without wasting energy on excessively high or rapid steps.</li>
 
                     <div class="image-container">
                         <video autoplay loop muted playsinline>
@@ -264,75 +266,59 @@
     asset_cfg: SceneEntityCfg,
     sensor_cfg: SceneEntityCfg,
     target_height: float,
-    x_offset: float = 0.066,  # Distance from ankle origin to sole
-    y_toe: float = 0.094,  # Distance from ankle origin to front of foot
-    y_heel: float = 0.056,  # Distance from ankle origin to back of foot
+    x_offset: float = 0.066,
+    y_toe: float = 0.094,
+    y_heel: float = 0.056,
 ) -> torch.Tensor:
-    """
-    Event-Driven Sparse Reward with Asymmetric Virtual Proxy Points.
-    Tracks the lowest point of a 2-point line (toe and heel) for each foot.
-    Automatically scales so that a max height of 0.0 (ground) results in 0.0 reward.
-    """
     num_envs = env.num_envs
 
-    # 1. Initialize persistent buffers
     if not hasattr(env, "max_foot_z"):
         env.max_foot_z = torch.zeros((num_envs, 2), device=env.device)
         env.last_contact = torch.ones(
             (num_envs, 2), dtype=torch.bool, device=env.device
         )
 
-    # 2. Get Ankle Positions, Orientations, and Contact Forces
-    ankle_pos = env.scene[asset_cfg.name].data.body_pos_w[:, asset_cfg.body_ids]
-    ankle_quat = env.scene[asset_cfg.name].data.body_quat_w[:, asset_cfg.body_ids]
-    contact_forces = env.scene[sensor_cfg.name].data.net_forces_w[
-        :, sensor_cfg.body_ids, 2
-    ]
+    # 1. Get Contact Forces
+    contact_sensor = env.scene.sensors[sensor_cfg.name]
+    contact_forces = contact_sensor.data.net_forces_w[:, sensor_cfg.body_ids, 2]
 
     current_contact = contact_forces > 1.0
+    in_air = ~current_contact
 
-    # 3. Define the 2-point line (Toe, Heel) for each foot individually
-    # Left foot: Y-axis is flipped (Toe is -y, Heel is +y)
+    # 2. Get Kinematics
+    ankle_pos = env.scene[asset_cfg.name].data.body_pos_w[:, asset_cfg.body_ids]
+    ankle_quat = env.scene[asset_cfg.name].data.body_quat_w[:, asset_cfg.body_ids]
+
+    # 3. Define Virtual Proxy Points
     points_local_l = torch.tensor(
-        [
-            [x_offset, -y_toe, 0.0],
-            [x_offset, y_heel, 0.0],
-        ],
+        [[x_offset, -y_toe, 0.0], [x_offset, y_heel, 0.0]],
         device=env.device,
         dtype=torch.float32,
     )
-
-    # Right foot: Standard orientation (Toe is +y, Heel is -y)
     points_local_r = torch.tensor(
-        [
-            [x_offset, y_toe, 0.0],
-            [x_offset, -y_heel, 0.0],
-        ],
+        [[x_offset, y_toe, 0.0], [x_offset, -y_heel, 0.0]],
         device=env.device,
         dtype=torch.float32,
     )
 
     def get_lowest_point_z(pos, quat, local_points):
         lowest_z = torch.full((num_envs,), float("inf"), device=env.device)
-        for i in range(2):  # Only evaluating 2 points now
+        for i in range(2):
             point_vec = local_points[i].unsqueeze(0).expand(num_envs, 3)
             rotated_point = quat_apply(quat, point_vec)
             world_point = pos + rotated_point
             lowest_z = torch.minimum(lowest_z, world_point[:, 2])
         return lowest_z
 
-    # Pass the specific Left/Right local point tensors into the calculator
     lowest_z_l = get_lowest_point_z(
         ankle_pos[:, 0, :], ankle_quat[:, 0, :], points_local_l
     )
     lowest_z_r = get_lowest_point_z(
         ankle_pos[:, 1, :], ankle_quat[:, 1, :], points_local_r
     )
-
     lowest_foot_z = torch.stack([lowest_z_l, lowest_z_r], dim=1)
 
-    # 4. Update Max Z buffer
-    in_air = ~current_contact
+    # 4. Update Max Height Tracker
     env.max_foot_z = torch.where(
         in_air, torch.maximum(env.max_foot_z, lowest_foot_z), env.max_foot_z
     )
@@ -340,23 +326,38 @@
     # 5. Detect Touchdown Event
     touchdown = (~env.last_contact) & current_contact
 
-    # 6. Calculate Linear Error
+    # 6. Calculate Spatial Accuracy
     error_l = torch.abs(env.max_foot_z[:, 0] - target_height)
     error_r = torch.abs(env.max_foot_z[:, 1] - target_height)
 
-    # 7. Apply Dynamic Scaling
     raw_reward_l = torch.clamp(1.0 - (error_l / target_height), min=0.0)
     raw_reward_r = torch.clamp(1.0 - (error_r / target_height), min=0.0)
 
-    reward_l = raw_reward_l * touchdown[:, 0].float()
-    reward_r = raw_reward_r * touchdown[:, 1].float()
+    # 7. TIME INTEGRAL SCALING
+    last_air_time = contact_sensor.data.last_air_time[:, sensor_cfg.body_ids]
 
-    # 8. Reset the maximum tracker
+    reward_l = raw_reward_l * touchdown[:, 0].float() * last_air_time[:, 0]
+    reward_r = raw_reward_r * touchdown[:, 1].float() * last_air_time[:, 1]
+
+    # --- 8. INJECT TERMINAL METRICS ---
+    # Create a persistent buffer to hold the peak height of the most recently finished step
+    if not hasattr(env, "last_max_z"):
+        env.last_max_z = torch.zeros((num_envs, 2), device=env.device)
+
+    # Lock in the peak height exactly on the frame the foot touches down
+    env.last_max_z = torch.where(touchdown, env.max_foot_z, env.last_max_z)
+
+    # Initialize the RSL-RL log dictionary if it doesn't exist
+    if "log" not in env.extras:
+        env.extras["log"] = dict()
+
+    # Log the average peak height of the last completed steps across all 4096 robots
+    env.extras["log"]["Metrics/average_gait_height"] = torch.mean(env.last_max_z).item()
+
+    # 9. Reset and Update State
     env.max_foot_z = torch.where(
         touchdown, torch.zeros_like(env.max_foot_z), env.max_foot_z
     )
-
-    # 9. Save current contact state
     env.last_contact = current_contact
 
     return reward_l + reward_r</code></pre>
