@@ -45,39 +45,38 @@
                 my skillset towards this subfield for the duration of my early career. Welcome to my portfolio!</p>
         </section>
 
-        <!-- NEW HERO SECTION: Custom Biped (Clickable Card) -->
-        <a href="biped_overview.html" class="card hero-card"
-            style="display: block; text-decoration: none; color: inherit; border: 2px solid #007BFF; padding: 20px; border-radius: 12px; background-color: #ffffff;">
+        <!-- NEW FEATURED SECTION -->
+        <section class="card">
+            <h1>Featured Work</h1>
+            <div class="projects-grid">
 
-            <!-- Side-by-Side Videos Container -->
-            <div style="display: flex; gap: 15px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap;">
-                <!-- Real World Video -->
-                <video src="videos/biped_testing_7.mp4" alt="Real World Walking Tests" autoplay muted loop playsinline
-                    style="flex: 1; min-width: 280px; width: 100%; aspect-ratio: 1 / 1.2; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;">
-                    Your browser does not support the video tag.
-                </video>
-                <!-- Simulation Video -->
-                <video src="videos/biped_rough_terrain.mp4" alt="Isaac Lab Simulation" autoplay muted loop playsinline
-                    style="flex: 1; min-width: 280px; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;">
-                    Your browser does not support the video tag.
-                </video>
-            </div>
+                <!-- Apptronik Card -->
+                <a href="apptronik.html" class="project-card">
+                    <img src="images/apptronik_apollo_2.jpg" alt="Apptronik Apollo">
+                    <div class="card-content">
+                        <h4>Apptronik Internship</h4>
+                        <p>Electrical Engineering Intern, Automated Dynamometer Testing, Motor Control, Firmware
+                            Optimization</p>
+                        <p class="date">Jun 2025 - Aug 2025</p>
+                    </div>
+                </a>
 
-            <!-- Text Section -->
-            <div class="card-content" style="padding: 10px;">
-                <h1 style="margin-top: 0; color: #333;">1.1m, 55lb Custom 10-DOF Humanoid Biped</h1>
-                <h3 style="color: #555;">Zero-Shot Sim-to-Real RL • Distributed Impedance Control • Scratch-Built
-                    Hardware</h3>
-                <p style="color: #333;">A 25kg bipedal humanoid engineered entirely from scratch. Modular design
-                    assembled with custom actuators, mathematically decoupled dual-stage belt kinematics, and robust
-                    proximal policy
-                    optimization (PPO) trained via NVIDIA Isaac Lab. Capable of dynamic balancing and rough terrain
-                    traversal.</p>
-                <p class="date" style="color: #777; font-size: 0.9em; font-weight: 500; margin-top: 15px;">Jan 2026 -
-                    Present</p>
+                <!-- Custom Biped Card (Condensed for Grid Format) -->
+                <a href="biped_overview.html" class="project-card">
+                    <video src="videos/biped_testing_7.mp4" alt="Real World Walking Tests" autoplay muted loop
+                        playsinline>
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="card-content">
+                        <h4>10-DOF 25kg Biped (Personal)</h4>
+                        <p>Zero-Shot Sim-to-Real RL, PPO, Distributed Impedance Control, Scratch-Built Hardware</p>
+                        <p class="date">Jan 2026 - Present</p>
+                    </div>
+                </a>
+
             </div>
-        </a>
-        <!-- END HERO SECTION -->
+        </section>
+        <!-- END FEATURED SECTION -->
 
         <section class="card">
             <!-- Projects Section -->
