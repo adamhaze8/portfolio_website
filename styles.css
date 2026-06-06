@@ -158,7 +158,7 @@ nav a {
 .project-card img,
 .project-card video {
     width: 100%;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 4 / 5;
     object-fit: cover;
 }
 
