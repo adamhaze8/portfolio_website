@@ -37,11 +37,7 @@
     <main>
         <section class="card">
             <h1>About Me</h1>
-            <p>I'm Adam, a Robotics Engineering graduate from Queen's University with a passion for
-                designing, building, and
-                programming robots. My main areas of expertise (as of right now) include arms, computer vision and
-                mechanical design. I have a particular interest in human-centric robotics and have been building
-                my skillset towards this subfield for the duration of my early career. Welcome to my portfolio!</p>
+            <p>II'm Adam, a Mechatronics and Robotics Engineering graduate from Queen's University specializing in the intersection of hardware design and advanced control software. Over the last year, my work has focused heavily on reinforcement learning, automated hardware-in-the-loop diagnostics, and precise motor control optimization for dynamic robotic systems. From designing custom cycloidal actuators to training bipedal locomotion policies, I am passionate about building robust, high-performance robots from the ground up. Welcome to my portfolio!</p>
         </section>
 
         <section class="card">
@@ -55,7 +51,7 @@
                     </video>
                     <div class="card-content">
                         <h4>10-DOF 25kg Biped (Personal)</h4>
-                        <p>Brutal Sim-to-Real Gap, PPO, Distributed Impedance Control, Custom Actuators</p>
+                        <p>Sim-to-Real Gap, PPO, HIL Testing, Impedance Control, Custom Actuators, CNC Machining, Perseverance </p>
                         <p class="date">Jan 2026 - Present</p>
                     </div>
                 </a>
@@ -238,12 +234,28 @@
                     const city = data.city ? data.city.toLowerCase() : '';
                     
                     // Exclude Edmonton traffic
-                    if (city !== 'calgary') {
-                        // REPLACE THIS WITH YOUR ACTUAL WEBHOOK URL
+                    if (city !== 'edmonton') {
+                        
+                        // 1. Grab the HTTP Referrer
+                        let rawReferrer = document.referrer ? document.referrer : 'Direct/Unknown (Likely Copy-Pasted or Private Browser)';
+                        let trafficSource = rawReferrer;
+
+                        // 2. Format common sources nicely for Discord
+                        if (rawReferrer.includes('linkedin.com')) {
+                            trafficSource = '💼 LinkedIn';
+                        } else if (rawReferrer.includes('myworkdayjobs.com') || rawReferrer.includes('workday.com')) {
+                            trafficSource = '📝 Workday ATS';
+                        } else if (rawReferrer.includes('greenhouse.io')) {
+                            trafficSource = '📝 Greenhouse ATS';
+                        } else if (rawReferrer.includes('lever.co')) {
+                            trafficSource = '📝 Lever ATS';
+                        }
+                        
+                        // Your Discord Webhook URL
                         const webhookUrl = "https://discord.com/api/webhooks/1512848709916819496/heqWUOqS0yflfiw35hggd3yschMCxSZ6ovtXpIvWqkjuXwCx3_i9pOnEgcbl755u32Z5";
                         
                         const payload = {
-                            content: `🚀 **New Portfolio View!** \n**Location:** ${data.city}, ${data.region}, ${data.country_name} \n**Organization:** ${data.org} \n**Page:** ${window.location.pathname}`
+                            content: `🚀 **New Portfolio View!** \n**Source:** ${trafficSource} \n**Location:** ${data.city}, ${data.region}, ${data.country_name} \n**Organization:** ${data.org} \n**Page:** ${window.location.pathname}`
                         };
 
                         fetch(webhookUrl, {
