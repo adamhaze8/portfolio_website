@@ -7,7 +7,6 @@
     <meta name="description" content="Adam Hazenberg's Portfolio showcasing robotics and engineering projects">
     <title>Adam Hazenberg - Portfolio</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-C4KZZE8LH3"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -45,12 +44,22 @@
                 my skillset towards this subfield for the duration of my early career. Welcome to my portfolio!</p>
         </section>
 
-        <!-- NEW FEATURED SECTION -->
         <section class="card">
             <h1>Featured Work</h1>
             <div class="projects-grid">
 
-                <!-- Apptronik Card -->
+                <a href="biped_overview.html" class="project-card">
+                    <video src="videos/biped_testing_8.mp4" alt="Real World Walking Tests" autoplay muted loop
+                        playsinline>
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="card-content">
+                        <h4>10-DOF 25kg Biped (Personal)</h4>
+                        <p>Brutal Sim-to-Real Gap, PPO, Distributed Impedance Control, Custom Actuators</p>
+                        <p class="date">Jan 2026 - Present</p>
+                    </div>
+                </a>
+
                 <a href="apptronik.html" class="project-card">
                     <img src="images/apptronik_apollo_2.jpg" alt="Apptronik Apollo">
                     <div class="card-content">
@@ -61,25 +70,9 @@
                     </div>
                 </a>
 
-                <!-- Custom Biped Card (Condensed for Grid Format) -->
-                <a href="biped_overview.html" class="project-card">
-                    <video src="videos/biped_testing_8.mp4" alt="Real World Walking Tests" autoplay muted loop
-                        playsinline>
-                        Your browser does not support the video tag.
-                    </video>
-                    <div class="card-content">
-                        <h4>10-DOF 25kg Biped (Personal)</h4>
-                        <p>Zero-Shot Sim-to-Real RL, PPO, Distributed Impedance Control, Scratch-Built Hardware</p>
-                        <p class="date">Jan 2026 - Present</p>
-                    </div>
-                </a>
-
             </div>
         </section>
-        <!-- END FEATURED SECTION -->
-
         <section class="card">
-            <!-- Projects Section -->
             <h1>Other Projects</h1>
             <div class="projects-grid">
                 <a href="magnus.html" class="project-card">
@@ -106,8 +99,7 @@
                     </div>
                 </a>
 
-                <!-- Apptronik Electronics Prep Card -->
-                <a href="electronics_prep.html" class="project-card">
+                <a class="project-card">
                     <img src="images/power_monitoring_board.jpg" alt="Rapidly Executed Electronics Projects">
                     <div class="card-content">
                         <h4>Rapidly Executed Electronics Projects (Done in Preperation for Apptronik Internship)</h4>
@@ -125,7 +117,6 @@
                     </div>
                 </a>
 
-                <!-- CO2 Mapping Robot Project Card -->
                 <a href="co2_robot.html" class="project-card">
                     <img src="images/co2_mapping_robot.jpg" alt="CO2 Concentration Mapping Mobile Robot">
                     <div class="card-content">
@@ -236,6 +227,35 @@
             <a href="https://github.com/adamhaze8" target="_blank">GitHub</a>
         </p>
     </footer>
+
+    <script>
+        // Ensure this doesn't run repeatedly during local development testing
+        if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+            
+            fetch('https://ipapi.co/json/')
+                .then(response => response.json())
+                .then(data => {
+                    const city = data.city ? data.city.toLowerCase() : '';
+                    
+                    // Exclude Edmonton traffic
+                    if (city !== 'calgary') {
+                        // REPLACE THIS WITH YOUR ACTUAL WEBHOOK URL
+                        const webhookUrl = "https://discord.com/api/webhooks/1512848709916819496/heqWUOqS0yflfiw35hggd3yschMCxSZ6ovtXpIvWqkjuXwCx3_i9pOnEgcbl755u32Z5";
+                        
+                        const payload = {
+                            content: `🚀 **New Portfolio View!** \n**Location:** ${data.city}, ${data.region}, ${data.country_name} \n**Organization:** ${data.org} \n**Page:** ${window.location.pathname}`
+                        };
+
+                        fetch(webhookUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                    }
+                })
+                .catch(error => console.error('Error tracking visitor:', error));
+        }
+    </script>
 </body>
 
 </html>
