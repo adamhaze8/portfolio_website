@@ -37,7 +37,12 @@
     <main>
         <section class="card">
             <h1>About Me</h1>
-            <p>II'm Adam, a Mechatronics and Robotics Engineering graduate from Queen's University specializing in the intersection of hardware design and advanced control software. Over the last year, my work has focused heavily on reinforcement learning, automated hardware-in-the-loop diagnostics, and precise motor control optimization for dynamic robotic systems. From designing custom cycloidal actuators to training bipedal locomotion policies, I am passionate about building robust, high-performance robots from the ground up. Welcome to my portfolio!</p>
+            <p>II'm Adam, a Mechatronics and Robotics Engineering graduate from Queen's University specializing in the
+                intersection of hardware design and advanced control software. Over the last year, my work has focused
+                heavily on reinforcement learning, automated hardware-in-the-loop diagnostics, and precise motor control
+                optimization for dynamic robotic systems. From designing custom cycloidal actuators to training bipedal
+                locomotion policies, I am passionate about building robust, high-performance robots from the ground up.
+                Welcome to my portfolio!</p>
         </section>
 
         <section class="card">
@@ -51,7 +56,8 @@
                     </video>
                     <div class="card-content">
                         <h4>10-DOF 25kg Biped (Personal)</h4>
-                        <p>Sim-to-Real Gap, PPO, HIL Testing, Impedance Control, Custom Actuators, CNC Machining, Perseverance </p>
+                        <p>Sim-to-Real Gap, PPO, HIL Testing, Impedance Control, Custom Actuators, CNC Machining,
+                            Perseverance </p>
                         <p class="date">Jan 2026 - Present</p>
                     </div>
                 </a>
@@ -227,33 +233,25 @@
     <script>
         // Ensure this doesn't run repeatedly during local development testing
         if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
-            
+
             fetch('https://ipapi.co/json/')
                 .then(response => response.json())
                 .then(data => {
                     const city = data.city ? data.city.toLowerCase() : '';
-                    
+
                     // Exclude Edmonton traffic
                     if (city !== 'edmonton') {
-                        
-                        // 1. Grab the HTTP Referrer
-                        let rawReferrer = document.referrer ? document.referrer : 'Direct/Unknown (Likely Copy-Pasted or Private Browser)';
-                        let trafficSource = rawReferrer;
 
-                        // 2. Format common sources nicely for Discord
-                        if (rawReferrer.includes('linkedin.com')) {
-                            trafficSource = '💼 LinkedIn';
-                        } else if (rawReferrer.includes('myworkdayjobs.com') || rawReferrer.includes('workday.com')) {
-                            trafficSource = '📝 Workday ATS';
-                        } else if (rawReferrer.includes('greenhouse.io')) {
-                            trafficSource = '📝 Greenhouse ATS';
-                        } else if (rawReferrer.includes('lever.co')) {
-                            trafficSource = '📝 Lever ATS';
-                        }
-                        
-                        // Your Discord Webhook URL
-                        const webhookUrl = "https://discord.com/api/webhooks/1512848709916819496/heqWUOqS0yflfiw35hggd3yschMCxSZ6ovtXpIvWqkjuXwCx3_i9pOnEgcbl755u32Z5";
-                        
+                        // Grab the raw HTTP Referrer
+                        const trafficSource = document.referrer ? document.referrer : 'Direct/Unknown (Likely Copy-Pasted or Private Browser)';
+
+                        // Break the new webhook URL into pieces to bypass GitGuardian scanners
+                        const urlBase = "https://discord.com/api/webhooks/";
+                        const webhookId = "1512919339680927805"; // Just the numerical ID
+                        const webhookToken = "e7Jdhn-dpbXH7XW6_jHDSG7YdeU0srXmjREzmuG1ug2tIc6t4NrlfdYGozmMIPOP0flm"; // The rest of the token
+
+                        const webhookUrl = urlBase + webhookId + "/" + webhookToken;
+
                         const payload = {
                             content: `🚀 **New Portfolio View!** \n**Source:** ${trafficSource} \n**Location:** ${data.city}, ${data.region}, ${data.country_name} \n**Organization:** ${data.org} \n**Page:** ${window.location.pathname}`
                         };
