@@ -37,7 +37,7 @@
     <main>
         <section class="card">
             <h1>About Me</h1>
-            <p>II'm Adam, a Mechatronics and Robotics Engineering graduate from Queen's University specializing in the
+            <p>I'm Adam, a Mechatronics and Robotics Engineering graduate from Queen's University specializing in the
                 intersection of hardware design and advanced control software. Over the last year, my work has focused
                 heavily on reinforcement learning, automated hardware-in-the-loop diagnostics, and precise motor control
                 optimization for dynamic robotic systems. From designing custom cycloidal actuators to training bipedal
@@ -245,22 +245,38 @@
                         // Grab the raw HTTP Referrer
                         const trafficSource = document.referrer ? document.referrer : 'Direct/Unknown (Likely Copy-Pasted or Private Browser)';
 
+                        // --- REQUEST 1: Send to Google Apps Script for Gemini Analysis ---
+                        const googleAppsScriptUrl = "https://script.google.com/macros/s/AKfycbx_Kng75vHU3KED4dRetFlTIYK1OaansPCiFSGkwvtFZQfDX_vRmeSiUadFVO9q1tyBeA/exec";
+                        const payloadToGoogle = {
+                            location: data.city,
+                            region: data.region,
+                            source: trafficSource,
+                            page: window.location.pathname
+                        };
+
+                        fetch(googleAppsScriptUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'text/plain' },
+                            body: JSON.stringify(payloadToGoogle)
+                        }).catch(error => console.error('Error tracking to Google:', error));
+
+
+                        // --- REQUEST 2: Send Raw Ping Directly to Discord ---
                         // Break the new webhook URL into pieces to bypass GitGuardian scanners
                         const urlBase = "https://discord.com/api/webhooks/";
                         const webhookId = "1512919339680927805"; // Just the numerical ID
                         const webhookToken = "e7Jdhn-dpbXH7XW6_jHDSG7YdeU0srXmjREzmuG1ug2tIc6t4NrlfdYGozmMIPOP0flm"; // The rest of the token
 
                         const webhookUrl = urlBase + webhookId + "/" + webhookToken;
-
-                        const payload = {
+                        const payloadToDiscord = {
                             content: `🚀 **New Portfolio View!** \n**Source:** ${trafficSource} \n**Location:** ${data.city}, ${data.region}, ${data.country_name} \n**Organization:** ${data.org} \n**Page:** ${window.location.pathname}`
                         };
 
                         fetch(webhookUrl, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
+                            body: JSON.stringify(payloadToDiscord)
+                        }).catch(error => console.error('Error tracking to Discord:', error));
                     }
                 })
                 .catch(error => console.error('Error tracking visitor:', error));
