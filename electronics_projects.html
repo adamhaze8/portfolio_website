@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Custom Electronics and PCB Projects by Adam Hazenberg">
+    <title>Electronics Projects - Adam Hazenberg</title>
+    <link rel="stylesheet" href="styles.css">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C4KZZE8LH3"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-C4KZZE8LH3');
+    </script>
+</head>
+
+<body>
+    <header>
+        <div class="profile-img">
+            <img src="images/profile_picture.jpg" alt="Adam Hazenberg">
+            <div class="profile-info">
+                <h1>Adam Hazenberg</h1>
+                <h2>Robotics Engineering Undergrad Student</h2>
+            </div>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="card">
+            <h1>3-Channel Power Diagnostics PCB</h1>
+            <p>To support high-current robotic actuation, I architected and routed a custom mixed-signal PCB in KiCad.
+                This board is designed to monitor and distribute power across three independent motor channels,
+                providing real-time telemetry for dynamic load testing. The system utilizes an STM32 (Blue Pill)
+                microcontroller, heavy-duty Allegro ACS756 Hall-effect sensors for ±100A isolated current sensing, and
+                custom 16:1 resistor dividers to safely step down high-voltage rails for the ADCs. Rather than relying
+                on external fabrication, I prototyped the physical hardware entirely in-house by machining the board
+                from raw copper-clad FR4 using a CNC router and hand-soldering all components. An embedded C++ telemetry
+                loop continuously parses the data and pushes real-time power draw diagnostics to an I2C OLED display.
+            </p>
+
+            <div class="image-container">
+                <img src="images/power_monitoring_board_schematic.png" alt="KiCad Schematic for 3-Channel Power Board">
+
+                <img src="images/power_monitoring_board_routing.png" alt="KiCad PCB Routing Design">
+
+                <img src="images/power_monitoring_board.jpg" alt="Fabricated and Soldered PCB">
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Adam Hazenberg</p>
+        <p>
+            <a href="mailto:adamhaze8@gmail.com">Email</a> |
+            <a href="https://www.linkedin.com/in/adamhazenberg" target="_blank">LinkedIn</a> |
+            <a href="https://github.com/adamhaze8" target="_blank">GitHub</a>
+        </p>
+    </footer>
+</body>
+
+</html>
